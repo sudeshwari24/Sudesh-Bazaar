@@ -2,7 +2,7 @@
 
 ## 📌 Overview
 
-**Sudesh Bazaar** is a full-stack E-Commerce web application developed using **Python, Django, HTML, CSS, JavaScript, Bootstrap, and SQLite**. The application allows users to browse products, search items, manage shopping carts and wishlists, place orders, and track purchases through a responsive and user-friendly interface. It also provides an admin dashboard for managing products, categories, customers, and orders.
+**Sudesh Bazaar** is a full-stack E-Commerce web application developed using **Python, Django, HTML, CSS, JavaScript, and SQLite**. The application allows users to browse products, search items, manage shopping carts and wishlists, place orders, and track purchases through a responsive and user-friendly interface. It also provides an admin dashboard for managing products, categories, customers, and orders.
 
 ---
 ## 📷 Screenshots
@@ -59,7 +59,6 @@
 - HTML5
 - CSS3
 - JavaScript
-- Bootstrap
 
 ### Database
 - SQLite
