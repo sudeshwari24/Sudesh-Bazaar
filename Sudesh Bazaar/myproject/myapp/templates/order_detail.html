@@ -1,0 +1,689 @@
+ {% extends "base.html" %}
+{% load static %}
+
+{% block title %}
+Order #{{ order.id }}
+{% endblock %}
+
+{% block content %}
+
+<style>
+
+.order-detail-page {
+    padding-top: 28px !important;
+}
+
+.order-detail-heading {
+    display: flex !important;
+    align-items: center !important;
+    justify-content: space-between !important;
+    gap: 20px;
+    margin-bottom: 24px !important;
+    min-height: 72px;
+}
+
+.order-detail-heading h1 {
+    margin: 0 0 6px;
+}
+
+.order-detail-heading p {
+    margin: 0;
+}
+
+.order-detail-heading-actions {
+    display: flex;
+    align-items: center;
+    gap: 12px;
+    flex-shrink: 0;
+}
+
+.download-invoice-btn,
+.back-orders-btn {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    min-height: 42px;
+    padding: 0 18px;
+    box-sizing: border-box;
+    text-decoration: none;
+    font-size: 13px;
+    font-weight: 700;
+}
+
+.download-invoice-btn {
+    background: #2874f0;
+    color: #ffffff;
+    border: 1px solid #2874f0;
+}
+
+.download-invoice-btn:hover {
+    background: #1c5fd4;
+    border-color: #1c5fd4;
+    color: #ffffff;
+}
+
+
+/* =========================================
+   CANCEL ORDER CARD
+========================================= */
+
+.cancel-order-card {
+    border: 1px solid #fecaca !important;
+}
+
+.cancel-order-card h2 {
+    color: #b91c1c;
+}
+
+.cancel-order-content {
+    padding: 20px;
+}
+
+.cancel-order-content p {
+    margin: 0 0 18px;
+    color: #6b7280;
+    font-size: 14px;
+    line-height: 1.6;
+}
+
+.cancel-order-btn {
+    width: 100%;
+    min-height: 46px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    background: #ffffff;
+    border: 1px solid #dc2626;
+    color: #dc2626;
+    text-decoration: none;
+    box-sizing: border-box;
+    font-size: 13px;
+    font-weight: 700;
+    transition: 0.2s ease;
+}
+
+.cancel-order-btn:hover {
+    background: #dc2626;
+    color: #ffffff;
+}
+
+
+/* =========================================
+   CANCELLED ORDER BOX
+========================================= */
+
+.order-cancelled-box {
+    display: flex;
+    align-items: center;
+    gap: 18px;
+    padding: 24px 28px;
+    margin-bottom: 22px;
+    background: #fef2f2;
+    border: 1px solid #fecaca;
+}
+
+.cancelled-icon {
+    width: 46px;
+    height: 46px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    flex-shrink: 0;
+    border-radius: 50%;
+    background: #dc2626;
+    color: #ffffff;
+    font-size: 22px;
+    font-weight: 700;
+}
+
+.order-cancelled-box h2 {
+    margin: 0 0 5px;
+    color: #991b1b;
+    font-size: 20px;
+}
+
+.order-cancelled-box p {
+    margin: 0;
+    color: #7f1d1d;
+    font-size: 14px;
+}
+
+.cancelled-reason {
+    margin-top: 8px !important;
+}
+
+.cancelled-note {
+    margin-top: 4px !important;
+}
+
+
+/* =========================================
+   MOBILE
+========================================= */
+
+@media (max-width: 768px) {
+
+    .order-detail-page {
+        padding-top: 20px !important;
+    }
+
+    .order-detail-heading {
+        flex-direction: column;
+        align-items: flex-start !important;
+    }
+
+    .order-detail-heading-actions {
+        width: 100%;
+        flex-direction: column;
+    }
+
+    .download-invoice-btn,
+    .back-orders-btn {
+        width: 100%;
+    }
+
+}
+
+.delivery-estimate{
+
+    background:#ecfdf3;
+
+    border:1px solid #bbf7d0;
+
+    border-radius:8px;
+
+    padding:15px 20px;
+
+    margin-bottom:25px;
+
+}
+
+.delivery-label{
+
+    color:#666;
+
+    font-size:14px;
+
+}
+
+.delivery-estimate h3{
+
+    margin-top:8px;
+
+    color:#15803d;
+
+    font-size:22px;
+
+}
+
+</style>
+
+
+<section class="order-detail-page">
+
+    <div class="order-detail-container">
+
+
+        <!-- =====================================
+             PAGE HEADER
+        ====================================== -->
+
+        <div class="order-detail-heading">
+
+            <div>
+
+                <h1>
+                    Order Details
+                </h1>
+
+                <p>
+                    Order #{{ order.id }}
+                    •
+                    {{ order.created_at|date:"d M Y" }}
+                </p>
+
+            </div>
+
+
+            <div class="order-detail-heading-actions">
+
+
+                <!-- =====================================
+                     DOWNLOAD INVOICE
+                     DELIVERED ONLY
+                ====================================== -->
+
+                {% if order.status == "Delivered" %}
+
+                <a
+                    href="{% url 'download_invoice' order.id %}"
+                    class="download-invoice-btn"
+                >
+                    ↓ DOWNLOAD INVOICE
+                </a>
+
+                {% endif %}
+
+
+                <a
+                    href="{% url 'my_orders' %}"
+                    class="back-orders-btn"
+                >
+                    ← BACK TO ORDERS
+                </a>
+
+            </div>
+
+        </div>
+
+
+        <!-- =====================================
+             CANCELLED ORDER
+        ====================================== -->
+
+        {% if order.status == "Cancelled" %}
+
+        <div class="order-cancelled-box">
+
+            <div class="cancelled-icon">
+                ✕
+            </div>
+
+
+            <div>
+
+                <h2>
+                    Order Cancelled
+                </h2>
+
+
+                <p>
+                    This order has been cancelled.
+                </p>
+
+
+                {% if order.cancel_reason %}
+
+                <p class="cancelled-reason">
+
+                    <strong>
+                        Reason:
+                    </strong>
+
+                    {{ order.cancel_reason }}
+
+                </p>
+
+                {% endif %}
+
+
+                {% if order.cancel_note %}
+
+                <p class="cancelled-note">
+
+                    <strong>
+                        Details:
+                    </strong>
+
+                    {{ order.cancel_note }}
+
+                </p>
+
+                {% endif %}
+
+            </div>
+
+        </div>
+
+
+        {% else %}
+
+
+        <!-- =====================================
+             ORDER TRACKING
+        ====================================== -->
+
+        <div class="order-tracking-card">
+
+            <h2>
+                Track Order
+            </h2>
+
+            <div class="delivery-estimate">
+
+                <span class="delivery-label">
+                    Expected Delivery
+                </span>
+
+                <h3>
+                    {{ order.expected_delivery|date:"d M Y" }}
+                </h3>
+
+            </div>
+
+            <div class="tracking-wrapper">
+
+                <div class="tracking-step active">
+                    <div class="tracking-circle">✓</div>
+                    <div class="tracking-label">Order Confirmed</div>
+                </div>
+
+                <div class="tracking-line {% if order.status in 'Packed Shipped Out for Delivery Delivered' %}active{% endif %}"></div>
+
+                <div class="tracking-step {% if order.status == 'Packed' or order.status == 'Shipped' or order.status == 'Out for Delivery' or order.status == 'Delivered' %}active{% endif %}">
+                    <div class="tracking-circle">📦</div>
+                    <div class="tracking-label">Packed</div>
+                </div>
+
+                <div class="tracking-line {% if order.status == 'Shipped' or order.status == 'Out for Delivery' or order.status == 'Delivered' %}active{% endif %}"></div>
+
+                <div class="tracking-step {% if order.status == 'Shipped' or order.status == 'Out for Delivery' or order.status == 'Delivered' %}active{% endif %}">
+                    <div class="tracking-circle">🚚</div>
+                    <div class="tracking-label">Shipped</div>
+                </div>
+
+                <div class="tracking-line {% if order.status == 'Out for Delivery' or order.status == 'Delivered' %}active{% endif %}"></div>
+
+                <div class="tracking-step {% if order.status == 'Out for Delivery' or order.status == 'Delivered' %}active{% endif %}">
+                    <div class="tracking-circle">🚛</div>
+                    <div class="tracking-label">Out for Delivery</div>
+                </div>
+
+                <div class="tracking-line {% if order.status == 'Delivered' %}active{% endif %}"></div>
+
+                <div class="tracking-step {% if order.status == 'Delivered' %}active{% endif %}">
+                    <div class="tracking-circle">🏠</div>
+                    <div class="tracking-label">Delivered</div>
+                </div>
+
+            </div>
+
+        </div>
+
+        {% endif %}
+
+
+        <!-- =====================================
+             MAIN CONTENT
+        ====================================== -->
+
+        <div class="order-detail-layout">
+
+
+            <!-- =====================================
+                 ORDER SUMMARY
+            ====================================== -->
+
+            <div class="order-detail-products">
+
+                <div class="order-section-title">
+
+                    <h2>
+                        Order Summary
+                    </h2>
+
+                </div>
+
+
+                {% for item in order.items.all %}
+
+                <div class="order-detail-product">
+
+
+                    <div class="order-detail-image">
+
+                        {% if item.product %}
+
+                        <a
+                            href="{% url 'product_detail' item.product.id %}"
+                        >
+
+                            <img
+                                src="{{ item.product.image.url }}"
+                                alt="{{ item.product_name }}"
+                            >
+
+                        </a>
+
+                        {% endif %}
+
+                    </div>
+
+
+                    <div class="order-detail-info">
+
+
+                        {% if item.product %}
+
+                        <a
+                            href="{% url 'product_detail' item.product.id %}"
+                            class="order-detail-product-name"
+                        >
+                            {{ item.product_name }}
+                        </a>
+
+                        {% else %}
+
+                        <span class="order-detail-product-name">
+                            {{ item.product_name }}
+                        </span>
+
+                        {% endif %}
+
+
+                        <p>
+                            Quantity:
+                            {{ item.quantity }}
+                        </p>
+
+
+                        <div class="order-detail-price">
+
+                            ₹ {{ item.price }}
+
+                        </div>
+
+                    </div>
+
+
+                    <div class="order-detail-item-total">
+
+                        ₹ {{ item.total_price }}
+
+                    </div>
+
+                </div>
+
+                {% endfor %}
+
+            </div>
+
+
+            <!-- =====================================
+                 RIGHT SIDEBAR
+            ====================================== -->
+
+            <div class="order-detail-sidebar">
+
+
+                <!-- =====================================
+                     DELIVERY ADDRESS
+                ====================================== -->
+
+                <div class="order-info-card">
+
+                    <h2>
+                        Delivery Address
+                    </h2>
+
+
+                    <div class="order-info-content">
+
+                        <strong>
+                            {{ order.address.full_name }}
+                        </strong>
+
+
+                        <p>
+                            {{ order.address.address_line }}
+                        </p>
+
+
+                        <p>
+                            {{ order.address.city }},
+                            {{ order.address.state }}
+                            -
+                            {{ order.address.pincode }}
+                        </p>
+
+
+                        <p class="order-phone">
+
+                            <strong>
+                                Phone:
+                            </strong>
+
+                            {{ order.address.phone }}
+
+                        </p>
+
+                    </div>
+
+                </div>
+
+
+                <!-- =====================================
+                     PRICE DETAILS
+                ====================================== -->
+
+                <div class="order-info-card">
+
+                    <h2>
+                        Price Details
+                    </h2>
+
+
+                    <div class="order-price-content">
+
+                        <div class="order-price-row">
+
+                            <span>
+                                Total Amount
+                            </span>
+
+                            <strong>
+                                ₹ {{ order.total_amount }}
+                            </strong>
+
+                        </div>
+
+
+                        <div class="order-price-row">
+
+                            <span>
+                                Delivery Charges
+                            </span>
+
+                            <span class="order-free-delivery">
+                                FREE
+                            </span>
+
+                        </div>
+
+
+                        <div class="order-grand-total">
+
+                            <span>
+                                Grand Total
+                            </span>
+
+                            <strong>
+                                ₹ {{ order.total_amount }}
+                            </strong>
+
+                        </div>
+
+                    </div>
+
+                </div>
+
+
+                <!-- =====================================
+                     ORDER STATUS
+                ====================================== -->
+
+                <div class="order-info-card">
+
+                    <h2>
+                        Order Status
+                    </h2>
+
+
+                    <div class="current-order-status">
+
+                        <span>
+                            Current Status
+                        </span>
+
+
+                        <strong
+                            class="
+                            {% if order.status == 'Cancelled' %}
+                            cancelled-status
+                            {% else %}
+                            active-status
+                            {% endif %}
+                            "
+                        >
+                            {{ order.status }}
+                        </strong>
+
+                    </div>
+
+                </div>
+
+
+                <!-- =====================================
+                     CANCEL ORDER
+                ====================================== -->
+
+                {% if order.can_cancel %}
+
+                <div class="order-info-card cancel-order-card">
+
+                    <h2>
+                        Cancel Order
+                    </h2>
+
+
+                    <div class="cancel-order-content">
+
+                        <p>
+                            You can cancel this order before
+                            it is shipped.
+                        </p>
+
+
+                        <a
+                            href="{% url 'cancel_order' order.id %}"
+                            class="cancel-order-btn"
+                        >
+                            CANCEL ORDER
+                        </a>
+
+                    </div>
+
+                </div>
+
+                {% endif %}
+
+
+            </div>
+
+        </div>
+
+    </div>
+
+</section>
+
+{% endblock %}

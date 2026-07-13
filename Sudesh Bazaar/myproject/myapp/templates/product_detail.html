@@ -1,0 +1,1034 @@
+ {% extends "base.html" %}
+{% load static %}
+
+{% block title %}
+{{ product.name }}
+{% endblock %}
+
+{% block content %}
+
+<section class="product-detail-page">
+
+    <div class="product-detail-container">
+
+        <div class="product-detail-image">
+
+            <img
+                src="{{ product.image.url }}"
+                alt="{{ product.name }}"
+            >
+
+        </div>
+
+
+        <div class="product-detail-info">
+
+            <p class="product-category-name">
+                {{ product.category.name }}
+            </p>
+
+            <h1>
+                {{ product.name }}
+            </h1>
+
+
+            <div class="product-rating-row">
+
+                <span class="rating-badge">
+                    {{ average_rating }} ★
+                </span>
+
+                <span class="rating-text">
+                    {{ reviews_count }} Review{{ reviews_count|pluralize }}
+                </span>
+
+            </div>
+
+
+            <div class="detail-price-row">
+
+                <span class="detail-our-price">
+                    ₹ {{ product.price }}
+                </span>
+
+                {% if product.original_price %}
+
+                <span class="detail-original-price">
+                    ₹ {{ product.original_price }}
+                </span>
+
+                {% endif %}
+
+
+                {% if product.discount_percentage > 0 %}
+
+                <span class="detail-discount">
+                    {{ product.discount_percentage }}% OFF
+                </span>
+
+                {% endif %}
+
+            </div>
+
+
+            <div class="stock-section">
+
+                {% if product.stock > 0 %}
+
+                <span class="in-stock">
+                    In Stock
+                </span>
+
+                <span class="stock-count">
+                    {{ product.stock }} items available
+                </span>
+
+                {% else %}
+
+                <span class="out-of-stock">
+                    Out of Stock
+                </span>
+
+                {% endif %}
+
+            </div>
+
+
+            <div class="product-description">
+
+                <h3>
+                    Product Description
+                </h3>
+
+                <p>
+                    {{ product.description }}
+                </p>
+
+            </div>
+
+
+            {% if product.stock > 0 %}
+
+            <div class="quantity-section">
+
+                <span class="quantity-title">
+                    Quantity
+                </span>
+
+
+                <div class="quantity-box">
+
+                    <button
+                        type="button"
+                        id="minus-btn"
+                    >
+                        −
+                    </button>
+
+
+                    <span id="quantity">
+                        1
+                    </span>
+
+
+                    <button
+                        type="button"
+                        id="plus-btn"
+                    >
+                        +
+                    </button>
+
+                </div>
+
+            </div>
+
+
+            <div class="product-action-buttons">
+
+                <button
+                    type="button"
+                    class="detail-cart-btn"
+                    id="detail-cart-btn"
+                    data-id="{{ product.id }}"
+                >
+                    Add to Cart
+                </button>
+
+
+                <button
+                    type="button"
+                    class="buy-now-btn"
+                >
+                    Buy Now
+                </button>
+
+            </div>
+
+
+            
+
+
+            {% endif %}
+
+        </div>
+
+    </div>
+
+</section>
+
+
+<!-- =====================================
+     PRODUCT RATING & REVIEWS
+===================================== -->
+
+<section class="product-reviews-section">
+
+    <div class="product-reviews-container">
+
+        <div class="product-review-header">
+
+            <div>
+
+                <h2>
+                    Ratings & Reviews
+                </h2>
+
+                <p>
+                    Customer feedback for {{ product.name }}
+                </p>
+
+            </div>
+
+            <div class="product-rating-summary">
+
+                <strong>
+                    {{ average_rating }} ★
+                </strong>
+
+                <span>
+                    {{ reviews_count }}
+                    Review{{ reviews_count|pluralize }}
+                </span>
+
+            </div>
+
+        </div>
+
+
+        {% if messages %}
+
+            {% for message in messages %}
+
+            <div class="product-review-message {% if message.tags %}{{ message.tags }}{% endif %}">
+                {{ message }}
+            </div>
+
+            {% endfor %}
+
+        {% endif %}
+
+
+        {% if user.is_authenticated %}
+
+            {% if can_review %}
+
+                {% if user_review %}
+
+                <div
+                    class="product-review-form-card"
+                    id="edit-review-form"
+                    style="display: none;"
+                >
+
+                    <div class="review-edit-header">
+
+                        <h3>
+                            Update Your Review
+                        </h3>
+
+                        <button
+                            type="button"
+                            class="review-cancel-btn"
+                            id="cancel-review-edit"
+                        >
+                            CANCEL
+                        </button>
+
+                    </div>
+
+
+                    <form
+                        method="POST"
+                        action="{% url 'add_product_review' product.id %}"
+                        class="product-review-form"
+                    >
+
+                        {% csrf_token %}
+
+
+                        <div class="product-rating-field">
+
+                            <label>
+                                Your Rating
+                            </label>
+
+
+                            <div class="product-star-rating">
+
+                                <input
+                                    type="radio"
+                                    id="rating-5"
+                                    name="rating"
+                                    value="5"
+                                    {% if user_review.rating == 5 %}checked{% endif %}
+                                    required
+                                >
+
+                                <label
+                                    for="rating-5"
+                                    title="5 Stars"
+                                >
+                                    ★
+                                </label>
+
+
+                                <input
+                                    type="radio"
+                                    id="rating-4"
+                                    name="rating"
+                                    value="4"
+                                    {% if user_review.rating == 4 %}checked{% endif %}
+                                >
+
+                                <label
+                                    for="rating-4"
+                                    title="4 Stars"
+                                >
+                                    ★
+                                </label>
+
+
+                                <input
+                                    type="radio"
+                                    id="rating-3"
+                                    name="rating"
+                                    value="3"
+                                    {% if user_review.rating == 3 %}checked{% endif %}
+                                >
+
+                                <label
+                                    for="rating-3"
+                                    title="3 Stars"
+                                >
+                                    ★
+                                </label>
+
+
+                                <input
+                                    type="radio"
+                                    id="rating-2"
+                                    name="rating"
+                                    value="2"
+                                    {% if user_review.rating == 2 %}checked{% endif %}
+                                >
+
+                                <label
+                                    for="rating-2"
+                                    title="2 Stars"
+                                >
+                                    ★
+                                </label>
+
+
+                                <input
+                                    type="radio"
+                                    id="rating-1"
+                                    name="rating"
+                                    value="1"
+                                    {% if user_review.rating == 1 %}checked{% endif %}
+                                >
+
+                                <label
+                                    for="rating-1"
+                                    title="1 Star"
+                                >
+                                    ★
+                                </label>
+
+                            </div>
+
+                        </div>
+
+
+                        <div class="product-review-field">
+
+                            <label for="product-review-text">
+                                Your Review
+                            </label>
+
+                            <textarea
+                                id="product-review-text"
+                                name="review"
+                                maxlength="1000"
+                                placeholder="Write your experience with this product..."
+                                required
+                            >{{ user_review.review }}</textarea>
+
+                        </div>
+
+
+                        <button
+                            type="submit"
+                            class="product-review-submit-btn"
+                        >
+                            UPDATE REVIEW
+                        </button>
+
+                    </form>
+
+                </div>
+
+                {% else %}
+
+                <div class="product-review-form-card">
+
+                    <h3>
+                        Rate This Product
+                    </h3>
+
+
+                    <form
+                        method="POST"
+                        action="{% url 'add_product_review' product.id %}"
+                        class="product-review-form"
+                    >
+
+                        {% csrf_token %}
+
+
+                        <div class="product-rating-field">
+
+                            <label>
+                                Your Rating
+                            </label>
+
+
+                            <div class="product-star-rating">
+
+                                <input
+                                    type="radio"
+                                    id="rating-5"
+                                    name="rating"
+                                    value="5"
+                                    required
+                                >
+                                <label for="rating-5" title="5 Stars">★</label>
+
+                                <input
+                                    type="radio"
+                                    id="rating-4"
+                                    name="rating"
+                                    value="4"
+                                >
+                                <label for="rating-4" title="4 Stars">★</label>
+
+                                <input
+                                    type="radio"
+                                    id="rating-3"
+                                    name="rating"
+                                    value="3"
+                                >
+                                <label for="rating-3" title="3 Stars">★</label>
+
+                                <input
+                                    type="radio"
+                                    id="rating-2"
+                                    name="rating"
+                                    value="2"
+                                >
+                                <label for="rating-2" title="2 Stars">★</label>
+
+                                <input
+                                    type="radio"
+                                    id="rating-1"
+                                    name="rating"
+                                    value="1"
+                                >
+                                <label for="rating-1" title="1 Star">★</label>
+
+                            </div>
+
+                        </div>
+
+
+                        <div class="product-review-field">
+
+                            <label for="product-review-text">
+                                Your Review
+                            </label>
+
+                            <textarea
+                                id="product-review-text"
+                                name="review"
+                                maxlength="1000"
+                                placeholder="Write your experience with this product..."
+                                required
+                            ></textarea>
+
+                        </div>
+
+
+                        <button
+                            type="submit"
+                            class="product-review-submit-btn"
+                        >
+                            SUBMIT REVIEW
+                        </button>
+
+                    </form>
+
+                </div>
+
+                {% endif %}
+
+            {% else %}
+
+            <div class="product-review-not-eligible">
+
+                <span>
+                    🔒
+                </span>
+
+                <div>
+
+                    <strong>
+                        Verified purchase required
+                    </strong>
+
+                    <p>
+                        You can review this product after your order is delivered.
+                    </p>
+
+                </div>
+
+            </div>
+
+            {% endif %}
+
+        {% else %}
+
+        <div class="product-review-login">
+
+            <p>
+                Login to rate and review this product.
+            </p>
+
+            <a href="{% url 'login' %}">
+                LOGIN
+            </a>
+
+        </div>
+
+        {% endif %}
+
+
+        <div class="product-customer-reviews">
+
+            <h3>
+                Customer Reviews
+            </h3>
+
+
+            {% if reviews %}
+
+                {% for review in reviews %}
+
+                <div class="product-review-card">
+
+                    <div class="product-review-card-top">
+
+                        <div class="product-review-user">
+
+                            <div class="product-review-avatar">
+                                {{ review.user.username|first|upper }}
+                            </div>
+
+                            <div>
+
+                                <strong>
+                                    {{ review.user.username }}
+                                </strong>
+
+                                <span>
+                                    Verified Buyer
+                                </span>
+
+                            </div>
+
+                        </div>
+
+
+                        <div class="product-review-rating">
+                            {{ review.rating }} ★
+                        </div>
+
+                    </div>
+
+
+                    <p class="product-review-text">
+                        {{ review.review }}
+                    </p>
+
+
+                    <div class="product-review-bottom">
+
+                        <span class="product-review-date">
+                            {{ review.created_at|date:"d M Y" }}
+                        </span>
+
+
+                        {% if user.is_authenticated %}
+
+                            {% if review.user == user %}
+
+                            <button
+                                type="button"
+                                class="product-review-edit-btn"
+                                id="open-review-edit"
+                            >
+                                EDIT REVIEW
+                            </button>
+
+                            {% endif %}
+
+                        {% endif %}
+
+                    </div>
+
+                </div>
+
+                {% endfor %}
+
+            {% else %}
+
+            <div class="product-no-reviews">
+
+                <div>
+                    ☆
+                </div>
+
+                <h3>
+                    No reviews yet
+                </h3>
+
+                <p>
+                    Be the first verified customer to review this product.
+                </p>
+
+            </div>
+
+            {% endif %}
+
+        </div>
+
+    </div>
+
+</section>
+
+<script>
+
+document.addEventListener(
+    "DOMContentLoaded",
+    function () {
+
+
+        const minusButton =
+            document.getElementById(
+                "minus-btn"
+            );
+
+
+        const plusButton =
+            document.getElementById(
+                "plus-btn"
+            );
+
+
+        const quantityText =
+            document.getElementById(
+                "quantity"
+            );
+
+
+        const addCartButton =
+            document.getElementById(
+                "detail-cart-btn"
+            );
+
+
+        const navbarCartCount =
+            document.getElementById(
+                "navbar-cart-count"
+            );
+
+
+        const maxStock =
+            Number("{{ product.stock }}");
+
+
+        let quantity = 1;
+
+
+
+        // =====================================
+        // MINUS
+        // =====================================
+
+        if (minusButton) {
+
+            minusButton.addEventListener(
+                "click",
+                function () {
+
+                    if (quantity > 1) {
+
+                        quantity--;
+
+                        quantityText.textContent =
+                            quantity;
+
+                    }
+
+                }
+            );
+
+        }
+
+
+
+        // =====================================
+        // PLUS
+        // =====================================
+
+        if (plusButton) {
+
+            plusButton.addEventListener(
+                "click",
+                function () {
+
+                    if (quantity < maxStock) {
+
+                        quantity++;
+
+                        quantityText.textContent =
+                            quantity;
+
+                    }
+
+                }
+            );
+
+        }
+
+
+
+        // =====================================
+        // ADD TO CART
+        // =====================================
+
+        if (addCartButton) {
+
+            addCartButton.addEventListener(
+                "click",
+                function () {
+
+
+                    const productId =
+                        addCartButton.dataset.id;
+
+
+                    addCartButton.disabled =
+                        true;
+
+
+                    addCartButton.textContent =
+                        "Adding...";
+
+
+                    fetch(
+                        "/add-to-cart/"
+                        + productId
+                        + "/?quantity="
+                        + quantity
+                    )
+
+                    .then(response => {
+
+                        if (!response.ok) {
+
+                            throw new Error(
+                                "Server response error"
+                            );
+
+                        }
+
+                        return response.json();
+
+                    })
+
+                    .then(data => {
+
+
+                        // LOGIN REQUIRED
+
+                        if (data.login_required) {
+
+                            localStorage.setItem(
+                                "pending_cart",
+                                productId
+                            );
+
+
+                            localStorage.setItem(
+                                "pending_quantity",
+                                quantity
+                            );
+
+
+                            window.location.href =
+                                "/login/";
+
+
+                            return;
+
+                        }
+
+
+
+                        // ADD SUCCESS
+
+                        if (data.success) {
+
+
+                            console.log(
+                                "Cart count:",
+                                data.cart_count
+                            );
+
+
+                            // LIVE NAVBAR UPDATE
+
+                            if (navbarCartCount) {
+
+                                navbarCartCount.textContent =
+                                    data.cart_count;
+
+                            }
+
+
+                            showCartToast(
+                                data.message,
+                                "success"
+                            );
+
+
+                        } else {
+
+
+                            showCartToast(
+                                data.message,
+                                "error"
+                            );
+
+
+                        }
+
+
+                    })
+
+                    .catch(error => {
+
+
+                        console.error(
+                            "Add cart error:",
+                            error
+                        );
+
+
+                        showCartToast(
+                            "Something went wrong",
+                            "error"
+                        );
+
+
+                    })
+
+                    .finally(() => {
+
+
+                        addCartButton.disabled =
+                            false;
+
+
+                        addCartButton.textContent =
+                            "Add to Cart";
+
+
+                    });
+
+
+                }
+            );
+
+        }
+
+
+
+        // =====================================
+        // EDIT REVIEW OPEN / CLOSE
+        // =====================================
+
+        const openReviewEditButton =
+            document.getElementById(
+                "open-review-edit"
+            );
+
+
+        const cancelReviewEditButton =
+            document.getElementById(
+                "cancel-review-edit"
+            );
+
+
+        const editReviewForm =
+            document.getElementById(
+                "edit-review-form"
+            );
+
+
+        if (
+            openReviewEditButton
+            && editReviewForm
+        ) {
+
+            openReviewEditButton.addEventListener(
+                "click",
+                function () {
+
+                    editReviewForm.style.display =
+                        "block";
+
+
+                    editReviewForm.scrollIntoView({
+                        behavior: "smooth",
+                        block: "center"
+                    });
+
+                }
+            );
+
+        }
+
+
+        if (
+            cancelReviewEditButton
+            && editReviewForm
+        ) {
+
+            cancelReviewEditButton.addEventListener(
+                "click",
+                function () {
+
+                    editReviewForm.style.display =
+                        "none";
+
+                }
+            );
+
+        }
+
+
+
+        // =====================================
+        // TOAST
+        // =====================================
+
+        function showCartToast(
+            message,
+            type
+        ) {
+
+
+            const oldToast =
+                document.querySelector(
+                    ".cart-toast"
+                );
+
+
+            if (oldToast) {
+
+                oldToast.remove();
+
+            }
+
+
+            const toast =
+                document.createElement(
+                    "div"
+                );
+
+
+            toast.className =
+                "cart-toast";
+
+
+            if (type === "error") {
+
+                toast.style.background =
+                    "#dc3545";
+
+            }
+
+
+            toast.textContent =
+                type === "success"
+                ? "✓ " + message
+                : "⚠ " + message;
+
+
+            document.body.appendChild(
+                toast
+            );
+
+
+            setTimeout(
+                function () {
+
+                    toast.classList.add(
+                        "hide"
+                    );
+
+                },
+                2500
+            );
+
+
+            setTimeout(
+                function () {
+
+                    toast.remove();
+
+                },
+                3000
+            );
+
+
+        }
+
+
+    }
+);
+
+</script>
+
+{% endblock %}

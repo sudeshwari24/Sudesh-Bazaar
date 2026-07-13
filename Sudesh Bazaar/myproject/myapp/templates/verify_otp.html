@@ -1,0 +1,159 @@
+{% extends "base.html" %}
+{% load static %}
+
+{% block title %}
+Verify OTP
+{% endblock %}
+
+{% block auth_content %}
+
+<div class="secure-auth-page">
+
+    <div class="secure-auth-card otp-auth-card">
+
+        <div class="secure-auth-header">
+
+            <div class="secure-auth-icon">
+                ✉
+            </div>
+
+            <h2>
+                Verify Login OTP
+            </h2>
+
+            <p>
+                We sent a 6-digit verification code to
+            </p>
+
+            <strong class="masked-email">
+                {{ masked_email }}
+            </strong>
+
+        </div>
+
+
+        {% if messages %}
+
+            {% for message in messages %}
+
+                <div class="auth-message {{ message.tags }}">
+                    {{ message }}
+                </div>
+
+            {% endfor %}
+
+        {% endif %}
+
+
+        <form
+            method="POST"
+            id="otpForm"
+        >
+
+            {% csrf_token %}
+
+
+            <div class="auth-field">
+
+                <label for="otp">
+                    Enter OTP
+                </label>
+
+                <input
+                    type="text"
+                    id="otp"
+                    name="otp"
+                    class="secure-form-control otp-input"
+                    placeholder="000000"
+                    inputmode="numeric"
+                    autocomplete="one-time-code"
+                    maxlength="6"
+                    required
+                    autofocus
+                >
+
+            </div>
+
+
+            <button
+                type="submit"
+                class="secure-auth-btn"
+            >
+                VERIFY OTP
+            </button>
+
+        </form>
+
+
+        <div class="otp-expiry-note">
+
+            OTP is valid for
+            <strong>5 minutes</strong>.
+
+        </div>
+
+
+        <form
+            method="POST"
+            action="{% url 'resend_otp' %}"
+            class="resend-otp-form"
+        >
+
+            {% csrf_token %}
+
+            <span>
+                Didn't receive the code?
+            </span>
+
+            <button
+                type="submit"
+                class="resend-otp-btn"
+            >
+                RESEND OTP
+            </button>
+
+        </form>
+
+
+        <a
+            href="{% url 'login' %}"
+            class="back-login-link"
+        >
+            ← BACK TO LOGIN
+        </a>
+
+    </div>
+
+</div>
+
+
+<script>
+
+document.addEventListener(
+    "DOMContentLoaded",
+    function () {
+
+        const otpInput =
+            document.getElementById(
+                "otp"
+            );
+
+
+        otpInput.addEventListener(
+            "input",
+            function () {
+
+                this.value =
+                    this.value
+                        .replace(/\D/g, "")
+                        .slice(0, 6);
+
+            }
+        );
+
+    }
+);
+
+</script>
+
+{% endblock %}

@@ -1,0 +1,1038 @@
+{% extends "base.html" %}
+{% load static %}
+
+{% block title %}
+Checkout
+{% endblock %}
+
+{% block content %}
+
+<section class="checkout-page">
+
+    <div class="checkout-layout">
+
+        <div class="checkout-left">
+
+            <!-- =====================================
+                 DELIVERY ADDRESS
+            ====================================== -->
+
+            <div class="checkout-card">
+
+                <div class="checkout-card-header">
+
+                    <span class="checkout-step">
+                        1
+                    </span>
+
+                    <h2>
+                        DELIVERY ADDRESS
+                    </h2>
+
+                </div>
+
+
+                {% if messages %}
+
+                    {% for message in messages %}
+
+                        <div class="checkout-message">
+                            {{ message }}
+                        </div>
+
+                    {% endfor %}
+
+                {% endif %}
+
+
+                <!-- =====================================
+                     SAVED ADDRESSES
+                ====================================== -->
+
+                {% if addresses %}
+
+                    <div class="saved-address-list">
+
+                        {% for address in addresses %}
+
+                            <label class="saved-address-card">
+
+                                <div class="saved-address-radio">
+
+                                    <input
+                                        type="radio"
+                                        name="selected_address"
+                                        value="{{ address.id }}"
+                                        form="checkout-order-form"
+
+                                        {% if address.is_default %}
+                                            checked
+                                        {% endif %}
+                                    >
+
+                                </div>
+
+
+                                <div class="saved-address-content">
+
+                                    <div class="saved-address-top">
+
+                                        <strong>
+                                            {{ address.full_name }}
+                                        </strong>
+
+
+                                        {% if address.is_default %}
+
+                                            <span class="default-address-badge">
+                                                DEFAULT
+                                            </span>
+
+                                        {% endif %}
+
+                                    </div>
+
+
+                                    <p>
+                                        {{ address.address_line }}
+                                    </p>
+
+
+                                    <p>
+
+                                        {{ address.city }},
+                                        {{ address.state }}
+                                        - {{ address.pincode }}
+
+                                    </p>
+
+
+                                    <p class="saved-address-phone">
+
+                                        <strong>
+                                            Phone:
+                                        </strong>
+
+                                        {{ address.phone }}
+
+                                    </p>
+
+                                </div>
+
+                            </label>
+
+                        {% endfor %}
+
+                    </div>
+
+                {% endif %}
+
+
+                <!-- =====================================
+                     ADD NEW ADDRESS
+                ====================================== -->
+
+                <button
+                    type="button"
+                    class="add-new-address-btn"
+                    id="addNewAddressBtn"
+                >
+                    + ADD NEW ADDRESS
+                </button>
+
+
+                <!-- =====================================
+                     NEW ADDRESS FORM
+                ====================================== -->
+
+                <div
+                    class="new-address-wrapper"
+                    id="newAddressWrapper"
+
+                    {% if addresses %}
+                        style="display: none;"
+                    {% endif %}
+                >
+
+                    <div class="new-address-heading">
+
+                        <h3>
+                            ADD NEW ADDRESS
+                        </h3>
+
+                    </div>
+
+
+                    <div class="checkout-form-grid">
+
+                        <div class="checkout-form-group">
+
+                            <label>
+                                Full Name
+                            </label>
+
+                            <input
+                                type="text"
+                                name="full_name"
+                                form="checkout-order-form"
+                                placeholder="Enter full name"
+                            >
+
+                        </div>
+
+
+                        <div class="checkout-form-group">
+
+                            <label>
+                                Phone Number
+                            </label>
+
+                            <input
+                                type="text"
+                                name="phone"
+                                form="checkout-order-form"
+                                placeholder="10 digit mobile number"
+                                maxlength="10"
+                                inputmode="numeric"
+                            >
+
+                        </div>
+
+                    </div>
+
+
+                    <div class="checkout-form-group">
+
+                        <label>
+                            Address
+                        </label>
+
+                        <textarea
+                            name="address_line"
+                            form="checkout-order-form"
+                            placeholder="House No, Building, Street, Area"
+                        ></textarea>
+
+                    </div>
+
+
+                    <div class="checkout-form-grid">
+
+                        <div class="checkout-form-group">
+
+                            <label>
+                                City
+                            </label>
+
+                            <input
+                                type="text"
+                                name="city"
+                                form="checkout-order-form"
+                                placeholder="Enter city"
+                            >
+
+                        </div>
+
+
+                        <div class="checkout-form-group">
+
+                            <label>
+                                State
+                            </label>
+
+                            <input
+                                type="text"
+                                name="state"
+                                form="checkout-order-form"
+                                placeholder="Enter state"
+                            >
+
+                        </div>
+
+                    </div>
+
+
+                    <div class="checkout-form-group checkout-pincode-group">
+
+                        <label>
+                            Pincode
+                        </label>
+
+                        <input
+                            type="text"
+                            name="pincode"
+                            form="checkout-order-form"
+                            placeholder="6 digit pincode"
+                            maxlength="6"
+                            inputmode="numeric"
+                        >
+
+                    </div>
+
+                </div>
+
+            </div>
+
+
+            <!-- =====================================
+                 ORDER SUMMARY
+            ====================================== -->
+
+            <div class="checkout-card">
+
+                <div class="checkout-card-header">
+
+                    <span class="checkout-step">
+                        2
+                    </span>
+
+                    <h2>
+                        ORDER SUMMARY
+                    </h2>
+
+                </div>
+
+
+                <div class="checkout-order-items">
+
+                    {% for item in cart_items %}
+
+                        <div class="checkout-order-item">
+
+                            <div class="checkout-product-image">
+
+                                {% if item.product.image %}
+
+                                    <img
+                                        src="{{ item.product.image.url }}"
+                                        alt="{{ item.product.name }}"
+                                    >
+
+                                {% endif %}
+
+                            </div>
+
+
+                            <div class="checkout-product-info">
+
+                                <h3>
+                                    {{ item.product.name }}
+                                </h3>
+
+
+                                <p>
+                                    {{ item.product.category.name }}
+                                </p>
+
+
+                                <div class="checkout-product-price">
+
+                                    <span class="checkout-current-price">
+
+                                        ₹ {{ item.product.price }}
+
+                                    </span>
+
+
+                                    {% if item.product.original_price %}
+
+                                        <span class="checkout-original-price">
+
+                                            ₹ {{ item.product.original_price }}
+
+                                        </span>
+
+                                    {% endif %}
+
+
+                                    {% if item.product.discount_percentage > 0 %}
+
+                                        <span class="checkout-discount">
+
+                                            {{ item.product.discount_percentage }}% Off
+
+                                        </span>
+
+                                    {% endif %}
+
+                                </div>
+
+
+                                <span class="checkout-quantity">
+
+                                    Quantity: {{ item.quantity }}
+
+                                </span>
+
+                            </div>
+
+
+                            <div class="checkout-item-total">
+
+                                ₹ {{ item.total_price }}
+
+                            </div>
+
+                        </div>
+
+                    {% endfor %}
+
+                </div>
+
+            </div>
+
+
+            <!-- =====================================
+                 PAYMENT METHOD
+            ====================================== -->
+
+            <div class="checkout-card">
+
+                <div class="checkout-card-header">
+
+                    <span class="checkout-step">
+                        3
+                    </span>
+
+                    <h2>
+                        PAYMENT METHOD
+                    </h2>
+
+                </div>
+
+
+                <div class="checkout-payment-methods">
+
+
+                    <!-- CASH ON DELIVERY -->
+
+                    <label class="checkout-payment-option">
+
+                        <div class="checkout-payment-radio">
+
+                            <input
+                                type="radio"
+                                name="payment_method"
+                                value="COD"
+                                form="checkout-order-form"
+                                checked
+                            >
+
+                        </div>
+
+
+                        <div class="checkout-payment-icon">
+
+                            💵
+
+                        </div>
+
+
+                        <div class="checkout-payment-content">
+
+                            <strong>
+                                Cash on Delivery
+                            </strong>
+
+                            <p>
+                                Pay when your order is delivered.
+                            </p>
+
+                        </div>
+
+                    </label>
+
+
+                    <!-- ONLINE PAYMENT -->
+
+                    <label class="checkout-payment-option">
+
+                        <div class="checkout-payment-radio">
+
+                            <input
+                                type="radio"
+                                name="payment_method"
+                                value="ONLINE"
+                                form="checkout-order-form"
+                            >
+
+                        </div>
+
+
+                        <div class="checkout-payment-icon">
+
+                            💳
+
+                        </div>
+
+
+                        <div class="checkout-payment-content">
+
+                            <strong>
+                                Pay Online
+                            </strong>
+
+                            <p>
+                                Secure payment using Card, UPI or Net Banking.
+                            </p>
+
+                        </div>
+
+
+                        <span class="checkout-secure-badge">
+                            SECURE
+                        </span>
+
+                    </label>
+
+                </div>
+
+
+                <!-- =====================================
+                     CHECKOUT FORM
+                ====================================== -->
+
+                <form
+                    method="POST"
+                    id="checkout-order-form"
+                >
+
+                    {% csrf_token %}
+
+
+                    <button
+                        type="submit"
+                        class="checkout-place-order-btn"
+                        id="checkoutSubmitButton"
+                    >
+                        PLACE ORDER
+                    </button>
+
+                </form>
+
+            </div>
+
+        </div>
+
+
+        <!-- =====================================
+             PRICE DETAILS
+        ====================================== -->
+
+        <div class="checkout-right">
+
+            <div class="checkout-price-card">
+
+                <h3>
+                    PRICE DETAILS
+                </h3>
+
+
+                <div class="checkout-price-row">
+
+                    <span>
+                        Price ({{ cart_count }} items)
+                    </span>
+
+
+                    <span>
+                        ₹ {{ subtotal }}
+                    </span>
+
+                </div>
+
+
+                <div class="checkout-price-row">
+
+                    <span>
+                        Delivery Charges
+                    </span>
+
+
+                    <span class="checkout-free">
+                        FREE
+                    </span>
+
+                </div>
+
+
+                <div class="checkout-total-row">
+
+                    <span>
+                        Total Amount
+                    </span>
+
+
+                    <span>
+                        ₹ {{ subtotal }}
+                    </span>
+
+                </div>
+
+
+                <p class="checkout-safe-text">
+
+                    🔒 Safe and Secure Payments. Easy returns.
+
+                </p>
+
+            </div>
+
+        </div>
+
+    </div>
+
+</section>
+
+
+<style>
+
+.checkout-payment-methods
+{
+    padding: 0 24px 24px;
+}
+
+
+.checkout-payment-option
+{
+    position: relative;
+
+    display: flex;
+
+    align-items: center;
+
+    gap: 18px;
+
+    min-height: 82px;
+
+    padding: 18px 20px;
+
+    margin-bottom: 14px;
+
+    border: 1px solid #d9dee7;
+
+    background: #ffffff;
+
+    cursor: pointer;
+
+    transition:
+        border-color 0.2s ease,
+        box-shadow 0.2s ease,
+        background 0.2s ease;
+}
+
+
+.checkout-payment-option:hover
+{
+    border-color: #2874f0;
+
+    box-shadow:
+        0 4px 14px
+        rgba(40, 116, 240, 0.08);
+}
+
+
+.checkout-payment-option.payment-selected
+{
+    border: 2px solid #2874f0;
+
+    background: #f5f9ff;
+}
+
+
+.checkout-payment-radio
+{
+    display: flex;
+
+    align-items: center;
+
+    justify-content: center;
+}
+
+
+.checkout-payment-radio input
+{
+    width: 19px;
+
+    height: 19px;
+
+    accent-color: #2874f0;
+
+    cursor: pointer;
+}
+
+
+.checkout-payment-icon
+{
+    width: 44px;
+
+    height: 44px;
+
+    display: flex;
+
+    align-items: center;
+
+    justify-content: center;
+
+    border-radius: 50%;
+
+    background: #eff6ff;
+
+    font-size: 22px;
+}
+
+
+.checkout-payment-content
+{
+    flex: 1;
+}
+
+
+.checkout-payment-content strong
+{
+    display: block;
+
+    margin-bottom: 6px;
+
+    color: #172337;
+
+    font-size: 16px;
+}
+
+
+.checkout-payment-content p
+{
+    margin: 0;
+
+    color: #6b7280;
+
+    font-size: 14px;
+}
+
+
+.checkout-secure-badge
+{
+    padding: 5px 9px;
+
+    border-radius: 3px;
+
+    background: #ecfdf3;
+
+    color: #16a34a;
+
+    font-size: 11px;
+
+    font-weight: 700;
+}
+
+
+#checkout-order-form
+{
+    padding:
+        0
+        24px
+        24px;
+}
+
+
+.checkout-place-order-btn
+{
+    width: 100%;
+
+    min-height: 50px;
+
+    border: none;
+
+    background: #fb641b;
+
+    color: #ffffff;
+
+    font-size: 15px;
+
+    font-weight: 700;
+
+    cursor: pointer;
+
+    transition:
+        background 0.2s ease,
+        transform 0.2s ease;
+}
+
+
+.checkout-place-order-btn:hover
+{
+    background: #e85b17;
+}
+
+
+.checkout-place-order-btn:active
+{
+    transform: scale(0.99);
+}
+
+
+.checkout-place-order-btn:disabled
+{
+    opacity: 0.7;
+
+    cursor: not-allowed;
+}
+
+
+@media
+(
+    max-width: 768px
+)
+{
+
+    .checkout-payment-option
+    {
+        gap: 12px;
+
+        padding: 16px;
+    }
+
+
+    .checkout-secure-badge
+    {
+        display: none;
+    }
+
+}
+
+</style>
+
+
+<script>
+
+document.addEventListener(
+    "DOMContentLoaded",
+    function ()
+    {
+
+        // =====================================
+        // ADDRESS
+        // =====================================
+
+        const addButton =
+            document.getElementById(
+                "addNewAddressBtn"
+            );
+
+
+        const addressWrapper =
+            document.getElementById(
+                "newAddressWrapper"
+            );
+
+
+        if (
+            addButton
+            &&
+            addressWrapper
+        )
+        {
+
+            addButton.addEventListener(
+                "click",
+                function ()
+                {
+
+                    addressWrapper.style.display =
+                        "block";
+
+
+                    const selectedAddresses =
+                        document.querySelectorAll(
+                            'input[name="selected_address"]'
+                        );
+
+
+                    selectedAddresses.forEach(
+                        function (radio)
+                        {
+
+                            radio.checked = false;
+
+                        }
+                    );
+
+
+                    addressWrapper.scrollIntoView(
+                        {
+
+                            behavior: "smooth",
+
+                            block: "center"
+
+                        }
+                    );
+
+                }
+            );
+
+        }
+
+
+        const addressRadios =
+            document.querySelectorAll(
+                'input[name="selected_address"]'
+            );
+
+
+        addressRadios.forEach(
+            function (radio)
+            {
+
+                radio.addEventListener(
+                    "change",
+                    function ()
+                    {
+
+                        if (addressWrapper)
+                        {
+
+                            addressWrapper.style.display =
+                                "none";
+
+                        }
+
+                    }
+                );
+
+            }
+        );
+
+
+        // =====================================
+        // PAYMENT METHOD UI
+        // =====================================
+
+        const paymentInputs =
+            document.querySelectorAll(
+                'input[name="payment_method"]'
+            );
+
+
+        const paymentOptions =
+            document.querySelectorAll(
+                ".checkout-payment-option"
+            );
+
+
+        const submitButton =
+            document.getElementById(
+                "checkoutSubmitButton"
+            );
+
+
+        function updatePaymentUI()
+        {
+
+            paymentOptions.forEach(
+                function (option)
+                {
+
+                    option.classList.remove(
+                        "payment-selected"
+                    );
+
+                }
+            );
+
+
+            const selectedPayment =
+                document.querySelector(
+                    'input[name="payment_method"]:checked'
+                );
+
+
+            if (!selectedPayment)
+            {
+
+                return;
+
+            }
+
+
+            selectedPayment
+                .closest(
+                    ".checkout-payment-option"
+                )
+                .classList.add(
+                    "payment-selected"
+                );
+
+
+            if (
+                selectedPayment.value
+                === "ONLINE"
+            )
+            {
+
+                submitButton.textContent =
+                    "CONTINUE TO SECURE PAYMENT";
+
+            }
+
+            else
+            {
+
+                submitButton.textContent =
+                    "PLACE ORDER";
+
+            }
+
+        }
+
+
+        paymentInputs.forEach(
+            function (input)
+            {
+
+                input.addEventListener(
+                    "change",
+                    updatePaymentUI
+                );
+
+            }
+        );
+
+
+        updatePaymentUI();
+
+
+        // =====================================
+        // PREVENT DOUBLE SUBMIT
+        // =====================================
+
+        const checkoutForm =
+            document.getElementById(
+                "checkout-order-form"
+            );
+
+
+        if (checkoutForm)
+        {
+
+            checkoutForm.addEventListener(
+                "submit",
+                function ()
+                {
+
+                    submitButton.disabled = true;
+
+                    submitButton.textContent =
+                        "PROCESSING...";
+
+                }
+            );
+
+        }
+
+    }
+);
+
+</script>
+
+{% endblock %}

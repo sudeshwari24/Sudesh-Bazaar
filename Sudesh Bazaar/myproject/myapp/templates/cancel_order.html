@@ -1,0 +1,476 @@
+{% extends "base.html" %}
+{% load static %}
+
+{% block content %}
+
+<div class="cancel-page">
+
+    <div class="cancel-container">
+
+        <div class="cancel-header">
+
+            <a
+                href="{% url 'order_detail' order.id %}"
+                class="back-link"
+            >
+                ← BACK TO ORDER DETAILS
+            </a>
+
+            <h1>
+                Cancel Order
+            </h1>
+
+            <p>
+                Order #{{ order.id }}
+                •
+                {{ order.created_at|date:"d M Y" }}
+            </p>
+
+        </div>
+
+
+        <!-- =====================================
+             ERROR MESSAGES ONLY
+        ====================================== -->
+
+        {% if messages %}
+
+            {% for message in messages %}
+
+                {% if message.tags == "error" %}
+
+                    <div class="cancel-message">
+
+                        {{ message }}
+
+                    </div>
+
+                {% endif %}
+
+            {% endfor %}
+
+        {% endif %}
+
+
+        <div class="cancel-layout">
+
+
+            <!-- =====================================
+                 ORDER SUMMARY
+            ====================================== -->
+
+            <div class="cancel-order-card">
+
+                <div class="card-title">
+
+                    Order Summary
+
+                </div>
+
+
+                {% for item in order.items.all %}
+
+                    <div class="cancel-product">
+
+
+                        <!-- PRODUCT IMAGE -->
+
+                        <div class="cancel-product-image">
+
+                            {% if item.product and item.product.image %}
+
+                                <img
+                                    src="{{ item.product.image.url }}"
+                                    alt="{{ item.product_name }}"
+                                >
+
+                            {% endif %}
+
+                        </div>
+
+
+                        <!-- PRODUCT INFORMATION -->
+
+                        <div class="cancel-product-info">
+
+                            <h3>
+
+                                {{ item.product_name }}
+
+                            </h3>
+
+
+                            <p>
+
+                                Quantity:
+                                {{ item.quantity }}
+
+                            </p>
+
+
+                            <strong>
+
+                                ₹ {{ item.price|floatformat:2 }}
+
+                            </strong>
+
+                        </div>
+
+
+                        <!-- ITEM TOTAL -->
+
+                        <div class="cancel-product-total">
+
+                            ₹ {{ item.total_price|floatformat:2 }}
+
+                        </div>
+
+
+                    </div>
+
+                {% endfor %}
+
+
+                <!-- ORDER TOTAL -->
+
+                <div class="cancel-order-total">
+
+                    <span>
+
+                        Order Total
+
+                    </span>
+
+
+                    <strong>
+
+                        ₹ {{ order.total_amount|floatformat:2 }}
+
+                    </strong>
+
+                </div>
+
+            </div>
+
+
+            <!-- =====================================
+                 CANCEL FORM
+            ====================================== -->
+
+            <div class="cancel-form-card">
+
+                <div class="card-title">
+
+                    Why are you cancelling?
+
+                </div>
+
+
+                <form
+                    method="POST"
+                    id="cancelOrderForm"
+                >
+
+                    {% csrf_token %}
+
+
+                    <!-- =====================================
+                         CANCEL REASONS
+                    ====================================== -->
+
+                    <div class="cancel-reasons">
+
+                        {% for value, label in cancel_reasons %}
+
+                            <label class="cancel-reason-option">
+
+                                <input
+                                    type="radio"
+                                    name="cancel_reason"
+                                    value="{{ value }}"
+                                    required
+                                >
+
+
+                                <span class="custom-radio"></span>
+
+
+                                <span class="reason-text">
+
+                                    {{ label }}
+
+                                </span>
+
+                            </label>
+
+                        {% endfor %}
+
+                    </div>
+
+
+                    <!-- =====================================
+                         OTHER REASON NOTE
+                    ====================================== -->
+
+                    <div
+                        class="cancel-note-box"
+                        id="cancelNoteBox"
+                    >
+
+                        <label for="cancelNote">
+
+                            Tell us your reason
+
+                        </label>
+
+
+                        <textarea
+                            name="cancel_note"
+                            id="cancelNote"
+                            maxlength="500"
+                            placeholder="Please enter your cancellation reason..."
+                        ></textarea>
+
+                    </div>
+
+
+                    <!-- =====================================
+                         CANCEL WARNING
+                    ====================================== -->
+
+                    <div class="cancel-warning">
+
+                        <strong>
+
+                            Please note
+
+                        </strong>
+
+
+                        <p>
+
+                            Once cancelled, this order cannot be restored.
+                            Product stock will be updated automatically.
+
+                        </p>
+
+                    </div>
+
+
+                    <!-- =====================================
+                         ACTION BUTTONS
+                    ====================================== -->
+
+                    <div class="cancel-actions">
+
+                        <a
+                            href="{% url 'order_detail' order.id %}"
+                            class="keep-order-btn"
+                        >
+
+                            KEEP ORDER
+
+                        </a>
+
+
+                        <button
+                            type="submit"
+                            class="confirm-cancel-btn"
+                        >
+
+                            CANCEL ORDER
+
+                        </button>
+
+                    </div>
+
+                </form>
+
+            </div>
+
+        </div>
+
+    </div>
+
+</div>
+
+
+<script>
+
+document.addEventListener(
+    "DOMContentLoaded",
+    function () {
+
+
+        // =====================================
+        // ELEMENTS
+        // =====================================
+
+        const reasonInputs =
+            document.querySelectorAll(
+                'input[name="cancel_reason"]'
+            );
+
+
+        const noteBox =
+            document.getElementById(
+                "cancelNoteBox"
+            );
+
+
+        const noteInput =
+            document.getElementById(
+                "cancelNote"
+            );
+
+
+        const cancelForm =
+            document.getElementById(
+                "cancelOrderForm"
+            );
+
+
+        // =====================================
+        // CANCEL REASON CHANGE
+        // =====================================
+
+        reasonInputs.forEach(
+            function (input) {
+
+                input.addEventListener(
+                    "change",
+                    function () {
+
+
+                        // =================================
+                        // OTHER REASON
+                        // =================================
+
+                        if (
+                            this.value === "Other"
+                        ) {
+
+                            noteBox.classList.add(
+                                "show"
+                            );
+
+
+                            noteInput.required = true;
+
+
+                            noteInput.focus();
+
+                        }
+
+
+                        // =================================
+                        // NORMAL REASON
+                        // =================================
+
+                        else {
+
+                            noteBox.classList.remove(
+                                "show"
+                            );
+
+
+                            noteInput.required = false;
+
+
+                            noteInput.value = "";
+
+                        }
+
+                    }
+                );
+
+            }
+        );
+
+
+        // =====================================
+        // CONFIRM CANCEL ORDER
+        // =====================================
+
+        cancelForm.addEventListener(
+            "submit",
+            function (event) {
+
+
+                const selectedReason =
+                    document.querySelector(
+                        'input[name="cancel_reason"]:checked'
+                    );
+
+
+                // =================================
+                // NO REASON SELECTED
+                // =================================
+
+                if (!selectedReason) {
+
+                    event.preventDefault();
+
+
+                    alert(
+                        "Please select a cancellation reason."
+                    );
+
+
+                    return;
+
+                }
+
+
+                // =================================
+                // OTHER NOTE VALIDATION
+                // =================================
+
+                if (
+                    selectedReason.value === "Other"
+                    &&
+                    !noteInput.value.trim()
+                ) {
+
+                    event.preventDefault();
+
+
+                    alert(
+                        "Please enter your cancellation reason."
+                    );
+
+
+                    noteInput.focus();
+
+
+                    return;
+
+                }
+
+
+                // =================================
+                // FINAL CONFIRMATION
+                // =================================
+
+                const confirmCancel =
+                    confirm(
+                        "Are you sure you want to cancel this order?"
+                    );
+
+
+                if (!confirmCancel) {
+
+                    event.preventDefault();
+
+                }
+
+            }
+        );
+
+
+    }
+);
+
+</script>
+
+{% endblock %}

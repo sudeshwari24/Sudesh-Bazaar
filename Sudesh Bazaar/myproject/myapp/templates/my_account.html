@@ -1,0 +1,637 @@
+ {% extends "base.html" %}
+{% load static %}
+
+{% block title %}
+My Account
+{% endblock %}
+
+{% block content %}
+
+<section class="my-account-page">
+
+    <div class="my-account-container">
+
+
+        <!-- =====================================
+             PAGE HEADER
+        ====================================== -->
+
+        <div class="my-account-header">
+
+            <h1>
+                My Account
+            </h1>
+
+            <p>
+                Manage your profile and account
+            </p>
+
+        </div>
+
+
+        <div class="my-account-layout">
+
+
+            <!-- =====================================
+                 LEFT SIDEBAR
+            ====================================== -->
+
+            <div class="account-sidebar">
+
+
+                <div class="account-user-card">
+
+                    <div class="account-avatar">
+
+                        {{ user.username|first|upper }}
+
+                    </div>
+
+
+                    <div class="account-user-info">
+
+                        <span>
+                            Hello,
+                        </span>
+
+                        <strong>
+                            {{ user.username }}
+                        </strong>
+
+                    </div>
+
+                </div>
+
+
+                <div class="account-menu">
+
+
+                    <!-- PROFILE -->
+
+                    <div class="account-menu-item active">
+
+                        👤
+
+                        <span>
+                            Profile Information
+                        </span>
+
+                    </div>
+
+
+                    <!-- MY ORDERS -->
+
+                    <a
+                        href="{% url 'my_orders' %}"
+                        class="account-menu-item"
+                    >
+
+                        📦
+
+                        <span>
+                            My Orders
+                        </span>
+
+                        <strong>
+                            {{ orders_count }}
+                        </strong>
+
+                    </a>
+
+
+                    <!-- SAVED ADDRESSES -->
+
+                    <div class="account-menu-item">
+
+                        📍
+
+                        <span>
+                            Saved Addresses
+                        </span>
+
+                    </div>
+
+
+                    <!-- LOGOUT -->
+
+                    <a
+                        href="{% url 'logout' %}"
+                        class="account-menu-item account-logout"
+                    >
+
+                        ↪
+
+                        <span>
+                            Logout
+                        </span>
+
+                    </a>
+
+                </div>
+
+            </div>
+
+
+
+            <!-- =====================================
+                 RIGHT CONTENT
+            ====================================== -->
+
+            <div class="account-content">
+
+
+                <!-- =====================================
+                     PROFILE MESSAGES
+                ====================================== -->
+
+                {% if messages %}
+
+                    {% for message in messages %}
+
+                    <div
+                        class="account-message
+                        {% if message.tags %}
+                        {{ message.tags }}
+                        {% endif %}"
+                    >
+
+                        {{ message }}
+
+                    </div>
+
+                    {% endfor %}
+
+                {% endif %}
+
+
+
+                <!-- =====================================
+                     PROFILE INFORMATION
+                ====================================== -->
+
+                <div class="account-card">
+
+
+                    <div class="account-card-header account-profile-header">
+
+                        <h2>
+                            Profile Information
+                        </h2>
+
+
+                        <button
+                            type="button"
+                            class="account-edit-btn"
+                            id="account-edit-btn"
+                        >
+                            EDIT
+                        </button>
+
+                    </div>
+
+
+
+                    <!-- =================================
+                         VIEW PROFILE
+                    ================================== -->
+
+                    <div
+                        class="account-profile-view"
+                        id="account-profile-view"
+                    >
+
+
+                        <div class="account-information-grid">
+
+
+                            <!-- FIRST NAME -->
+
+                            <div class="account-information-item">
+
+                                <span>
+                                    First Name
+                                </span>
+
+                                <strong>
+                                    {{ user.first_name|default:"-" }}
+                                </strong>
+
+                            </div>
+
+
+                            <!-- LAST NAME -->
+
+                            <div class="account-information-item">
+
+                                <span>
+                                    Last Name
+                                </span>
+
+                                <strong>
+                                    {{ user.last_name|default:"-" }}
+                                </strong>
+
+                            </div>
+
+
+                            <!-- USERNAME -->
+
+                            <div class="account-information-item">
+
+                                <span>
+                                    Username
+                                </span>
+
+                                <strong>
+                                    {{ user.username }}
+                                </strong>
+
+                            </div>
+
+
+                            <!-- EMAIL -->
+
+                            <div class="account-information-item">
+
+                                <span>
+                                    Email Address
+                                </span>
+
+                                <strong>
+                                    {{ user.email }}
+                                </strong>
+
+                            </div>
+
+
+                            <!-- PHONE -->
+
+                            <div class="account-information-item">
+
+                                <span>
+                                    Phone Number
+                                </span>
+
+                                <strong>
+
+                                    {% if profile %}
+
+                                        {{ profile.phone }}
+
+                                    {% else %}
+
+                                        -
+
+                                    {% endif %}
+
+                                </strong>
+
+                            </div>
+
+
+                        </div>
+
+                    </div>
+
+
+
+                    <!-- =================================
+                         EDIT PROFILE FORM
+                    ================================== -->
+
+                    <form
+                        method="POST"
+                        class="account-edit-form"
+                        id="account-edit-form"
+                    >
+
+                        {% csrf_token %}
+
+
+                        <div class="account-edit-grid">
+
+
+                            <!-- FIRST NAME -->
+
+                            <div class="account-edit-group">
+
+                                <label>
+                                    First Name
+                                </label>
+
+                                <input
+                                    type="text"
+                                    name="first_name"
+                                    value="{{ user.first_name }}"
+                                    required
+                                >
+
+                            </div>
+
+
+                            <!-- LAST NAME -->
+
+                            <div class="account-edit-group">
+
+                                <label>
+                                    Last Name
+                                </label>
+
+                                <input
+                                    type="text"
+                                    name="last_name"
+                                    value="{{ user.last_name }}"
+                                    required
+                                >
+
+                            </div>
+
+
+                            <!-- PHONE -->
+
+                            <div class="account-edit-group">
+
+                                <label>
+                                    Phone Number
+                                </label>
+
+                                <input
+                                    type="text"
+                                    name="phone"
+                                    value="{{ profile.phone }}"
+                                    maxlength="10"
+                                    inputmode="numeric"
+                                    required
+                                >
+
+                            </div>
+
+
+                            <!-- USERNAME -->
+
+                            <div class="account-edit-group">
+
+                                <label>
+                                    Username
+                                </label>
+
+                                <input
+                                    type="text"
+                                    value="{{ user.username }}"
+                                    disabled
+                                >
+
+                            </div>
+
+
+                            <!-- EMAIL -->
+
+                            <div class="account-edit-group">
+
+                                <label>
+                                    Email Address
+                                </label>
+
+                                <input
+                                    type="email"
+                                    value="{{ user.email }}"
+                                    disabled
+                                >
+
+                            </div>
+
+
+                        </div>
+
+
+
+                        <!-- ACTION BUTTONS -->
+
+                        <div class="account-edit-actions">
+
+
+                            <button
+                                type="submit"
+                                class="account-save-btn"
+                            >
+                                SAVE CHANGES
+                            </button>
+
+
+                            <button
+                                type="button"
+                                class="account-cancel-edit-btn"
+                                id="account-cancel-edit-btn"
+                            >
+                                CANCEL
+                            </button>
+
+
+                        </div>
+
+                    </form>
+
+
+                </div>
+
+
+
+                <!-- =====================================
+                     SAVED ADDRESSES
+                ====================================== -->
+
+                <div class="account-card">
+
+
+                    <div class="account-card-header">
+
+                        <h2>
+                            Saved Addresses
+                        </h2>
+
+                    </div>
+
+
+
+                    {% if addresses %}
+
+
+                    <div class="account-address-list">
+
+
+                        {% for address in addresses %}
+
+
+                        <div class="account-address-card">
+
+
+                            <!-- ADDRESS TOP -->
+
+                            <div class="account-address-top">
+
+
+                                <strong>
+                                    {{ address.full_name }}
+                                </strong>
+
+
+                                {% if address.is_default %}
+
+                                <span class="account-default-address">
+                                    DEFAULT
+                                </span>
+
+                                {% endif %}
+
+
+                            </div>
+
+
+
+                            <!-- ADDRESS LINE -->
+
+                            <p>
+                                {{ address.address_line }}
+                            </p>
+
+
+
+                            <!-- CITY STATE PINCODE -->
+
+                            <p>
+
+                                {{ address.city }},
+
+                                {{ address.state }}
+
+                                - {{ address.pincode }}
+
+                            </p>
+
+
+
+                            <!-- PHONE -->
+
+                            <p class="account-address-phone">
+
+                                <strong>
+                                    Phone:
+                                </strong>
+
+                                {{ address.phone }}
+
+                            </p>
+
+
+                        </div>
+
+
+                        {% endfor %}
+
+
+                    </div>
+
+
+                    {% else %}
+
+
+                    <!-- NO ADDRESS -->
+
+                    <div class="account-no-address">
+
+                        <p>
+                            No saved addresses available.
+                        </p>
+
+                    </div>
+
+
+                    {% endif %}
+
+
+                </div>
+
+
+            </div>
+
+
+        </div>
+
+
+    </div>
+
+</section>
+
+
+
+<!-- =====================================
+     PROFILE EDIT JAVASCRIPT
+===================================== -->
+
+<script>
+
+
+const accountEditButton =
+    document.getElementById(
+        "account-edit-btn"
+    );
+
+
+const accountCancelButton =
+    document.getElementById(
+        "account-cancel-edit-btn"
+    );
+
+
+const accountProfileView =
+    document.getElementById(
+        "account-profile-view"
+    );
+
+
+const accountEditForm =
+    document.getElementById(
+        "account-edit-form"
+    );
+
+
+
+accountEditButton.addEventListener(
+    "click",
+    function () {
+
+        accountProfileView.style.display =
+            "none";
+
+        accountEditForm.style.display =
+            "block";
+
+        accountEditButton.style.display =
+            "none";
+
+    }
+);
+
+
+
+accountCancelButton.addEventListener(
+    "click",
+    function () {
+
+        accountEditForm.style.display =
+            "none";
+
+        accountProfileView.style.display =
+            "block";
+
+        accountEditButton.style.display =
+            "inline-block";
+
+    }
+);
+
+
+</script>
+
+
+{% endblock %}

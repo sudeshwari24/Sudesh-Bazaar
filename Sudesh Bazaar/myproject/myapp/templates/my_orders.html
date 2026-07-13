@@ -1,0 +1,184 @@
+{% extends "base.html" %}
+{% load static %}
+
+{% block title %}
+My Orders
+{% endblock %}
+
+{% block content %}
+
+<section class="my-orders-page">
+
+    <div class="my-orders-container">
+
+        <div class="my-orders-header">
+
+            <h1>
+                My Orders
+            </h1>
+
+            <p>
+                View and track your orders
+            </p>
+
+        </div>
+
+
+        {% for order in orders %}
+
+        <div class="my-order-card">
+
+            <div class="my-order-top">
+
+                <div class="my-order-meta">
+
+                    <div>
+
+                        <span>
+                            ORDER ID
+                        </span>
+
+                        <strong>
+                            #{{ order.id }}
+                        </strong>
+
+                    </div>
+
+
+                    <div>
+
+                        <span>
+                            ORDER DATE
+                        </span>
+
+                        <strong>
+                            {{ order.created_at|date:"d M Y" }}
+                        </strong>
+
+                    </div>
+
+
+                    <div>
+
+                        <span>
+                            TOTAL
+                        </span>
+
+                        <strong>
+                            ₹ {{ order.total_amount }}
+                        </strong>
+
+                    </div>
+
+                </div>
+
+
+                <div class="my-order-status">
+
+                    <span
+                        class="
+                        {% if order.status == 'Cancelled' %}
+                        order-status-cancelled
+                        {% endif %}
+                        "
+                    >
+                        {{ order.status }}
+                    </span>
+
+                </div>
+
+            </div>
+
+
+            <div class="my-order-products">
+
+                {% for item in order.items.all %}
+
+                <div class="my-order-product">
+
+                    <div class="my-order-image">
+
+                        <img
+                            src="{{ item.product.image.url }}"
+                            alt="{{ item.product_name }}"
+                        >
+
+                    </div>
+
+
+                    <div class="my-order-product-info">
+
+                        <h3>
+                            {{ item.product_name }}
+                        </h3>
+
+                        <p>
+                            Quantity: {{ item.quantity }}
+                        </p>
+
+                        <strong>
+                            ₹ {{ item.price }}
+                        </strong>
+
+                    </div>
+
+
+                    <div class="my-order-product-total">
+
+                        ₹ {{ item.total_price }}
+
+                    </div>
+
+                </div>
+
+                {% endfor %}
+
+            </div>
+
+
+            <div class="my-order-bottom">
+
+                    <a
+                        href="{% url 'order_detail' order.id %}"
+                        class="view-order-btn"
+                    >
+                        VIEW ORDER DETAILS
+                    </a>
+
+            </div>
+
+        </div>
+
+
+        {% empty %}
+
+        <div class="no-orders">
+
+            <div class="no-orders-icon">
+                📦
+            </div>
+
+            <h2>
+                No orders yet
+            </h2>
+
+            <p>
+                You haven't placed any orders yet.
+            </p>
+
+            <a
+                href="{% url 'home' %}"
+                class="start-shopping-btn"
+            >
+                START SHOPPING
+            </a>
+
+        </div>
+
+        {% endfor %}
+
+    </div>
+
+</section>
+
+{% endblock %}

@@ -1,0 +1,440 @@
+{% extends "base.html" %}
+{% load static %}
+
+{% block title %}
+Order Confirmed
+{% endblock %}
+
+{% block content %}
+
+<section class="order-success-page">
+
+    <div class="order-success-container">
+        <div class="success-banner">
+
+            <div class="success-icon">
+                ✓
+            </div>
+
+            <div class="success-content">
+
+                <h1>Order Placed Successfully</h1>
+
+                <p>
+
+                    Your payment has been received successfully.
+
+                    Your order is confirmed and will be processed shortly.
+
+                </p>
+
+            </div>
+
+        </div>
+
+
+        <div class="order-summary-grid">
+
+            <div class="summary-card">
+
+                <span>ORDER ID</span>
+
+                <h3>#{{ order.id }}</h3>
+
+            </div>
+
+            <div class="summary-card">
+
+                <span>TOTAL</span>
+
+                <h3>₹ {{ order.total_amount }}</h3>
+
+            </div>
+
+            <div class="summary-card">
+
+                <span>PAYMENT</span>
+
+                <h3>{{ order.payment_method }}</h3>
+
+            </div>
+
+            <div class="summary-card">
+
+                <span>STATUS</span>
+
+                <h3 class="paid-status">{{ order.payment_status }}</h3>
+
+            </div>
+
+        </div>       
+
+
+        <!-- PAYMENT DETAILS -->
+
+        <div class="payment-success-card">
+
+            <div class="payment-success-header">
+
+                <div class="payment-success-icon">
+                    ✓
+                </div>
+
+                <div>
+
+                    <h2>
+                        Payment Successful
+                    </h2>
+
+                    <p>
+                        Your payment has been processed successfully.
+                    </p>
+
+                </div>
+
+            </div>
+
+
+            <div class="payment-detail-row">
+
+                <span>
+                    Payment Method
+                </span>
+
+                <strong>
+                    {{ order.payment_method }}
+                </strong>
+
+            </div>
+
+
+            <div class="payment-detail-row">
+
+                <span>
+                    Payment Status
+                </span>
+
+                <strong class="payment-paid">
+                    {{ order.payment_status }}
+                </strong>
+
+            </div>
+
+
+            <div class="payment-detail-row">
+
+                <span>
+                    Transaction ID
+                </span>
+
+                <strong>
+                    {{ order.razorpay_payment_id }}
+                </strong>
+
+            </div>
+
+
+            <div class="payment-detail-row">
+
+                <span>
+                    Paid On
+                </span>
+
+                <strong>
+                    {{ order.created_at|date:"d M Y, h:i A" }}
+                </strong>
+
+            </div>
+
+        </div>
+
+
+        <div class="order-success-content">
+
+            <div class="order-success-products">
+
+                <h2>Order Summary</h2>
+
+
+                {% for item in order.items.all %}
+
+                <div class="success-order-item">
+
+                    <div class="success-product-image">
+
+                        <img
+                            src="{{ item.product.image.url }}"
+                            alt="{{ item.product_name }}"
+                        >
+
+                    </div>
+
+
+                    <div class="success-product-info">
+
+                        <h3>
+                            {{ item.product_name }}
+                        </h3>
+
+                        <p>
+                            Quantity: {{ item.quantity }}
+                        </p>
+
+                        <span>
+                            ₹ {{ item.price }}
+                        </span>
+
+                    </div>
+
+
+                    <div class="success-item-total">
+
+                        ₹ {{ item.total_price }}
+
+                    </div>
+
+                </div>
+
+                {% endfor %}
+
+            </div>
+
+
+            <div class="order-address-card">
+
+                <h2>
+                    Delivery Address
+                </h2>
+
+                <strong>
+                    {{ order.address.full_name }}
+                </strong>
+
+                <p>
+                    {{ order.address.address_line }}
+                </p>
+
+                <p>
+                    {{ order.address.city }},
+                    {{ order.address.state }}
+                    - {{ order.address.pincode }}
+                </p>
+
+                <p>
+                    <strong>Phone:</strong>
+                    {{ order.address.phone }}
+                </p>
+
+            </div>
+
+        </div>
+
+
+        <div class="order-success-actions">
+
+            <a
+                href="{% url 'home' %}"
+                class="continue-shopping-btn"
+            >
+                CONTINUE SHOPPING
+            </a>
+
+        </div>
+
+    </div>
+
+</section>
+<style>
+
+.order-success-page{
+    background:#f1f3f6;
+    min-height:100vh;
+    padding:40px 20px;
+}
+
+.order-success-container{
+    max-width:1200px;
+    margin:auto;
+}
+
+.success-banner{
+    display:flex;
+    align-items:center;
+    gap:20px;
+    background:#fff;
+    padding:25px;
+    border-radius:10px;
+    margin-bottom:25px;
+    box-shadow:0 2px 10px rgba(0,0,0,.08);
+}
+
+.success-icon{
+    width:70px;
+    height:70px;
+    border-radius:50%;
+    background:#16a34a;
+    color:#fff;
+    display:flex;
+    align-items:center;
+    justify-content:center;
+    font-size:35px;
+    font-weight:bold;
+}
+
+.success-content h1{
+    margin:0;
+    color:#15803d;
+}
+
+.success-content p{
+    margin-top:8px;
+    color:#666;
+}
+
+.order-summary-grid{
+    display:grid;
+    grid-template-columns:repeat(4,1fr);
+    gap:15px;
+    margin-bottom:25px;
+}
+
+.summary-card{
+    background:#fff;
+    padding:20px;
+    border-radius:10px;
+    text-align:center;
+    box-shadow:0 2px 8px rgba(0,0,0,.05);
+}
+
+.summary-card span{
+    color:#777;
+    font-size:13px;
+}
+
+.summary-card h3{
+    margin-top:8px;
+    color:#172337;
+}
+
+.paid-status{
+    color:#16a34a;
+}
+
+.payment-success-card,
+.order-success-products,
+.order-address-card{
+
+    background:#fff;
+    border-radius:10px;
+    padding:25px;
+    box-shadow:0 2px 8px rgba(0,0,0,.05);
+
+}
+
+.payment-success-card{
+    margin-bottom:25px;
+}
+
+.payment-success-header{
+    display:flex;
+    align-items:center;
+    gap:15px;
+    margin-bottom:20px;
+}
+
+.payment-success-icon{
+    width:50px;
+    height:50px;
+    background:#16a34a;
+    color:#fff;
+    border-radius:50%;
+    display:flex;
+    justify-content:center;
+    align-items:center;
+    font-size:22px;
+}
+
+.payment-detail-row{
+    display:flex;
+    justify-content:space-between;
+    padding:12px 0;
+    border-bottom:1px solid #eee;
+}
+
+.payment-detail-row:last-child{
+    border:none;
+}
+
+.order-success-content{
+    display:grid;
+    grid-template-columns:2fr 1fr;
+    gap:25px;
+    margin-top:25px;
+}
+
+.success-order-item{
+    display:flex;
+    align-items:center;
+    gap:20px;
+    padding:15px 0;
+    border-bottom:1px solid #eee;
+}
+
+.success-product-image img{
+    width:90px;
+    height:90px;
+    object-fit:cover;
+}
+
+.success-item-total{
+    margin-left:auto;
+    font-weight:bold;
+}
+
+.order-success-actions{
+    margin-top:30px;
+    text-align:center;
+}
+
+.continue-shopping-btn{
+
+    display:inline-block;
+
+    background:#2874f0;
+
+    color:#fff;
+
+    padding:14px 30px;
+
+    border-radius:6px;
+
+    text-decoration:none;
+
+    font-weight:600;
+
+}
+
+.continue-shopping-btn:hover{
+
+    background:#1c5fd4;
+
+}
+
+@media(max-width:768px){
+
+.order-summary-grid{
+
+grid-template-columns:repeat(2,1fr);
+
+}
+
+.order-success-content{
+
+grid-template-columns:1fr;
+
+}
+
+}
+
+</style>
+{% endblock %}

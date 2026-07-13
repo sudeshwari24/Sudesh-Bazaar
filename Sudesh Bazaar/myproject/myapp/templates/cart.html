@@ -1,0 +1,1219 @@
+ {% extends "base.html" %}
+{% load static %}
+
+{% block title %}
+My Cart
+{% endblock %}
+
+{% block content %}
+
+<section class="cart-page">
+
+    <div class="cart-layout">
+
+        <!-- =====================================
+             CART ITEMS SECTION
+        ====================================== -->
+
+        <div class="cart-items-section">
+
+            <div class="cart-header">
+
+                <h2>
+                    My Cart (
+                    <span id="cart-header-count">
+                        {{ cart_count }}
+                    </span>
+                    )
+                </h2>
+
+            </div>
+
+
+            <div id="active-cart-items">
+
+                {% for item in cart_items %}
+
+                <div
+                    class="cart-item"
+                    id="cart-item-{{ item.id }}"
+                >
+
+                    <div class="cart-item-image">
+
+                        <a href="{% url 'product_detail' item.product.id %}">
+
+                            <img
+                                src="{{ item.product.image.url }}"
+                                alt="{{ item.product.name }}"
+                            >
+
+                        </a>
+
+                    </div>
+
+
+                    <div class="cart-item-info">
+
+                        <a
+                            href="{% url 'product_detail' item.product.id %}"
+                            class="cart-product-name"
+                        >
+                            {{ item.product.name }}
+                        </a>
+
+
+                        <p class="cart-category">
+                            {{ item.product.category.name }}
+                        </p>
+
+
+                        <div class="cart-price-row">
+
+                            <span class="cart-our-price">
+                                ₹ {{ item.product.price }}
+                            </span>
+
+
+                            {% if item.product.original_price %}
+
+                            <span class="cart-original-price">
+                                ₹ {{ item.product.original_price }}
+                            </span>
+
+                            {% endif %}
+
+
+                            {% if item.product.discount_percentage > 0 %}
+
+                            <span class="cart-discount">
+                                {{ item.product.discount_percentage }}% Off
+                            </span>
+
+                            {% endif %}
+
+                        </div>
+
+
+                        <div class="cart-item-actions">
+
+                            <div class="cart-quantity-box">
+
+                                <button
+                                    type="button"
+                                    class="cart-minus-btn"
+                                    data-id="{{ item.id }}"
+                                >
+                                    −
+                                </button>
+
+
+                                <span>
+                                    {{ item.quantity }}
+                                </span>
+
+
+                                <button
+                                    type="button"
+                                    class="cart-plus-btn"
+                                    data-id="{{ item.id }}"
+                                >
+                                    +
+                                </button>
+
+                            </div>
+
+
+                            <button
+                                type="button"
+                                class="save-later-btn"
+                                data-id="{{ item.id }}"
+                            >
+                                SAVE FOR LATER
+                            </button>
+
+
+                            <button
+                                type="button"
+                                class="remove-cart-btn"
+                                data-id="{{ item.id }}"
+                            >
+                                REMOVE
+                            </button>
+
+                        </div>
+
+                    </div>
+
+
+                    <div class="cart-item-total">
+
+                        <span>
+                            ₹ {{ item.total_price }}
+                        </span>
+
+                    </div>
+
+                </div>
+
+                {% empty %}
+
+                <div
+                    class="empty-cart"
+                    id="empty-cart-box"
+                >
+
+                    <div class="empty-cart-icon">
+                        🛒
+                    </div>
+
+                    <h2>
+                        Your cart is empty!
+                    </h2>
+
+                    <p>
+                        Add items to it now.
+                    </p>
+
+                    <a
+                        href="{% url 'home' %}"
+                        class="shop-now-btn"
+                    >
+                        Shop Now
+                    </a>
+
+                </div>
+
+                {% endfor %}
+
+            </div>
+
+
+            {% if cart_items %}
+
+            <div
+                class="cart-place-order-bar"
+                id="cart-place-order-bar"
+            >
+
+                <a
+                    href="{% url 'checkout' %}"
+                    class="place-order-btn"
+                >
+                    PLACE ORDER
+                </a>
+
+            </div>
+
+            {% endif %}
+
+        </div>
+
+
+        <!-- =====================================
+             PRICE DETAILS
+        ====================================== -->
+
+        {% if cart_items %}
+
+        <div
+            class="cart-price-section"
+            id="cart-price-section"
+        >
+
+            <div class="price-details-card">
+
+                <h3>
+                    PRICE DETAILS
+                </h3>
+
+
+                <div class="price-detail-row">
+
+                    <span id="price-item-count">
+                        Price ({{ cart_count }} items)
+                    </span>
+
+                    <span id="cart-subtotal">
+                        ₹ {{ subtotal }}
+                    </span>
+
+                </div>
+
+
+                <div class="price-detail-row">
+
+                    <span>
+                        Delivery Charges
+                    </span>
+
+                    <span class="free-delivery">
+                        FREE
+                    </span>
+
+                </div>
+
+
+                <div class="cart-total-row">
+
+                    <span>
+                        Total Amount
+                    </span>
+
+                    <span id="cart-total">
+                        ₹ {{ subtotal }}
+                    </span>
+
+                </div>
+
+
+                <p class="cart-saving-text">
+                    Your order is eligible for FREE Delivery.
+                </p>
+
+            </div>
+
+        </div>
+
+        {% endif %}
+
+    </div>
+
+
+    <!-- =====================================
+         SAVED FOR LATER
+    ====================================== -->
+
+    {% if saved_items %}
+
+    <div
+        class="saved-later-section"
+        id="saved-later-section"
+    >
+
+        <div class="saved-later-header">
+
+            <h2>
+                Saved For Later (
+                <span id="saved-later-count">
+                    {{ saved_items|length }}
+                </span>
+                )
+            </h2>
+
+        </div>
+
+
+        <div id="saved-items-container">
+
+            {% for item in saved_items %}
+
+            <div
+                class="saved-later-item"
+                id="saved-item-{{ item.id }}"
+            >
+
+                <div class="saved-later-image">
+
+                    <a href="{% url 'product_detail' item.product.id %}">
+
+                        <img
+                            src="{{ item.product.image.url }}"
+                            alt="{{ item.product.name }}"
+                        >
+
+                    </a>
+
+                </div>
+
+
+                <div class="saved-later-info">
+
+                    <a
+                        href="{% url 'product_detail' item.product.id %}"
+                        class="saved-product-name"
+                    >
+                        {{ item.product.name }}
+                    </a>
+
+
+                    <p class="saved-product-category">
+                        {{ item.product.category.name }}
+                    </p>
+
+
+                    <div class="saved-price-row">
+
+                        <span class="saved-our-price">
+                            ₹ {{ item.product.price }}
+                        </span>
+
+
+                        {% if item.product.original_price %}
+
+                        <span class="saved-original-price">
+                            ₹ {{ item.product.original_price }}
+                        </span>
+
+                        {% endif %}
+
+
+                        {% if item.product.discount_percentage > 0 %}
+
+                        <span class="saved-discount">
+                            {{ item.product.discount_percentage }}% Off
+                        </span>
+
+                        {% endif %}
+
+                    </div>
+
+
+                    <div class="saved-action-buttons">
+
+                        <button
+                            type="button"
+                            class="move-to-cart-btn"
+                            data-id="{{ item.id }}"
+                        >
+                            MOVE TO CART
+                        </button>
+
+                    </div>
+
+                </div>
+
+            </div>
+
+            {% endfor %}
+
+        </div>
+
+    </div>
+
+    {% endif %}
+
+</section>
+
+
+<script>
+
+document.addEventListener(
+    "DOMContentLoaded",
+    function () {
+
+
+        // =====================================
+        // UPDATE CART COUNT
+        // =====================================
+
+        function updateCartCount(cartCount) {
+
+            const navbarCartCount =
+                document.getElementById(
+                    "navbar-cart-count"
+                );
+
+
+            if (navbarCartCount) {
+
+                navbarCartCount.innerText =
+                    cartCount;
+
+            }
+
+
+            const cartHeaderCount =
+                document.getElementById(
+                    "cart-header-count"
+                );
+
+
+            if (cartHeaderCount) {
+
+                cartHeaderCount.innerText =
+                    cartCount;
+
+            }
+
+
+            const priceItemCount =
+                document.getElementById(
+                    "price-item-count"
+                );
+
+
+            if (priceItemCount) {
+
+                priceItemCount.innerText =
+                    "Price ("
+                    + cartCount
+                    + " items)";
+
+            }
+
+        }
+
+
+        // =====================================
+        // UPDATE PRICE DETAILS
+        // =====================================
+
+        function updatePriceDetails(subtotal) {
+
+            const cartSubtotal =
+                document.getElementById(
+                    "cart-subtotal"
+                );
+
+
+            const cartTotal =
+                document.getElementById(
+                    "cart-total"
+                );
+
+
+            if (cartSubtotal) {
+
+                cartSubtotal.innerText =
+                    "₹ "
+                    + formatPrice(subtotal);
+
+            }
+
+
+            if (cartTotal) {
+
+                cartTotal.innerText =
+                    "₹ "
+                    + formatPrice(subtotal);
+
+            }
+
+        }
+
+
+        // =====================================
+        // PLUS BUTTON
+        // =====================================
+
+        document
+        .querySelectorAll(".cart-plus-btn")
+        .forEach(button => {
+
+            button.addEventListener(
+                "click",
+                function () {
+
+                    updateCartQuantity(
+                        this,
+                        "plus"
+                    );
+
+                }
+            );
+
+        });
+
+
+        // =====================================
+        // MINUS BUTTON
+        // =====================================
+
+        document
+        .querySelectorAll(".cart-minus-btn")
+        .forEach(button => {
+
+            button.addEventListener(
+                "click",
+                function () {
+
+                    updateCartQuantity(
+                        this,
+                        "minus"
+                    );
+
+                }
+            );
+
+        });
+
+
+        // =====================================
+        // UPDATE CART QUANTITY
+        // =====================================
+
+        function updateCartQuantity(
+            button,
+            action
+        ) {
+
+            const cartItemId =
+                button.dataset.id;
+
+
+            const cartItem =
+                button.closest(
+                    ".cart-item"
+                );
+
+
+            button.disabled = true;
+
+
+            fetch(
+                "/update-cart/"
+                + cartItemId
+                + "/?action="
+                + action
+            )
+
+
+            .then(response =>
+                response.json()
+            )
+
+
+            .then(data => {
+
+                if (data.login_required) {
+
+                    window.location.href =
+                        "/login/";
+
+                    return;
+
+                }
+
+
+                if (!data.success) {
+
+                    showCartToast(
+                        data.message,
+                        "error"
+                    );
+
+                    return;
+
+                }
+
+
+                const quantityText =
+                    cartItem.querySelector(
+                        ".cart-quantity-box span"
+                    );
+
+
+                quantityText.innerText =
+                    data.quantity;
+
+
+                const itemTotal =
+                    cartItem.querySelector(
+                        ".cart-item-total span"
+                    );
+
+
+                itemTotal.innerText =
+                    "₹ "
+                    + formatPrice(
+                        data.item_total
+                    );
+
+
+                updateCartCount(
+                    data.cart_count
+                );
+
+
+                updatePriceDetails(
+                    data.subtotal
+                );
+
+            })
+
+
+            .catch(error => {
+
+                console.error(error);
+
+                showCartToast(
+                    "Something went wrong",
+                    "error"
+                );
+
+            })
+
+
+            .finally(() => {
+
+                button.disabled = false;
+
+            });
+
+        }
+
+
+        // =====================================
+        // SAVE FOR LATER
+        // =====================================
+
+        document
+        .querySelectorAll(".save-later-btn")
+        .forEach(button => {
+
+            button.addEventListener(
+                "click",
+                function () {
+
+                    const cartItemId =
+                        this.dataset.id;
+
+
+                    const currentButton =
+                        this;
+
+
+                    currentButton.disabled =
+                        true;
+
+
+                    fetch(
+                        "/save-for-later/"
+                        + cartItemId
+                        + "/"
+                    )
+
+
+                    .then(response =>
+                        response.json()
+                    )
+
+
+                    .then(data => {
+
+                        if (data.login_required) {
+
+                            window.location.href =
+                                "/login/";
+
+                            return;
+
+                        }
+
+
+                        if (!data.success) {
+
+                            showCartToast(
+                                "Unable to save product",
+                                "error"
+                            );
+
+                            return;
+
+                        }
+
+
+                        updateCartCount(
+                            data.cart_count
+                        );
+
+
+                        updatePriceDetails(
+                            data.subtotal
+                        );
+
+
+                        showCartToast(
+                            data.message,
+                            "success"
+                        );
+
+
+                        setTimeout(
+                            function () {
+
+                                window.location.reload();
+
+                            },
+                            400
+                        );
+
+                    })
+
+
+                    .catch(error => {
+
+                        console.error(error);
+
+                        showCartToast(
+                            "Something went wrong",
+                            "error"
+                        );
+
+                    })
+
+
+                    .finally(() => {
+
+                        currentButton.disabled =
+                            false;
+
+                    });
+
+                }
+            );
+
+        });
+
+
+        // =====================================
+        // MOVE TO CART
+        // =====================================
+
+        document
+        .querySelectorAll(".move-to-cart-btn")
+        .forEach(button => {
+
+            button.addEventListener(
+                "click",
+                function () {
+
+                    const cartItemId =
+                        this.dataset.id;
+
+
+                    const currentButton =
+                        this;
+
+
+                    currentButton.disabled =
+                        true;
+
+
+                    fetch(
+                        "/move-to-cart/"
+                        + cartItemId
+                        + "/"
+                    )
+
+
+                    .then(response =>
+                        response.json()
+                    )
+
+
+                    .then(data => {
+
+                        if (data.login_required) {
+
+                            window.location.href =
+                                "/login/";
+
+                            return;
+
+                        }
+
+
+                        if (!data.success) {
+
+                            showCartToast(
+                                data.message,
+                                "error"
+                            );
+
+                            return;
+
+                        }
+
+
+                        updateCartCount(
+                            data.cart_count
+                        );
+
+
+                        updatePriceDetails(
+                            data.subtotal
+                        );
+
+
+                        showCartToast(
+                            data.message,
+                            "success"
+                        );
+
+
+                        setTimeout(
+                            function () {
+
+                                window.location.reload();
+
+                            },
+                            400
+                        );
+
+                    })
+
+
+                    .catch(error => {
+
+                        console.error(error);
+
+                        showCartToast(
+                            "Something went wrong",
+                            "error"
+                        );
+
+                    })
+
+
+                    .finally(() => {
+
+                        currentButton.disabled =
+                            false;
+
+                    });
+
+                }
+            );
+
+        });
+
+
+        // =====================================
+        // REMOVE CART ITEM
+        // =====================================
+
+        document
+        .querySelectorAll(".remove-cart-btn")
+        .forEach(button => {
+
+            button.addEventListener(
+                "click",
+                function () {
+
+                    const cartItemId =
+                        this.dataset.id;
+
+
+                    const cartItem =
+                        this.closest(
+                            ".cart-item"
+                        );
+
+
+                    const currentButton =
+                        this;
+
+
+                    const confirmRemove =
+                        confirm(
+                            "Are you sure you want to remove this product?"
+                        );
+
+
+                    if (!confirmRemove) {
+
+                        return;
+
+                    }
+
+
+                    currentButton.disabled =
+                        true;
+
+
+                    fetch(
+                        "/remove-cart/"
+                        + cartItemId
+                        + "/"
+                    )
+
+
+                    .then(response =>
+                        response.json()
+                    )
+
+
+                    .then(data => {
+
+                        if (data.login_required) {
+
+                            window.location.href =
+                                "/login/";
+
+                            return;
+
+                        }
+
+
+                        if (!data.success) {
+
+                            showCartToast(
+                                "Unable to remove product",
+                                "error"
+                            );
+
+                            return;
+
+                        }
+
+
+                        cartItem.remove();
+
+
+                        updateCartCount(
+                            data.cart_count
+                        );
+
+
+                        updatePriceDetails(
+                            data.subtotal
+                        );
+
+
+                        showCartToast(
+                            data.message,
+                            "success"
+                        );
+
+
+                        if (data.cart_empty) {
+
+                            showEmptyCart();
+
+                        }
+
+                    })
+
+
+                    .catch(error => {
+
+                        console.error(error);
+
+                        showCartToast(
+                            "Something went wrong",
+                            "error"
+                        );
+
+                    })
+
+
+                    .finally(() => {
+
+                        currentButton.disabled =
+                            false;
+
+                    });
+
+                }
+            );
+
+        });
+
+
+        // =====================================
+        // EMPTY CART UI
+        // =====================================
+
+        function showEmptyCart() {
+
+            const activeCartItems =
+                document.getElementById(
+                    "active-cart-items"
+                );
+
+
+            if (activeCartItems) {
+
+                activeCartItems.innerHTML = `
+
+                    <div class="empty-cart">
+
+                        <div class="empty-cart-icon">
+                            🛒
+                        </div>
+
+                        <h2>
+                            Your cart is empty!
+                        </h2>
+
+                        <p>
+                            Add items to it now.
+                        </p>
+
+                        <a
+                            href="/"
+                            class="shop-now-btn"
+                        >
+                            Shop Now
+                        </a>
+
+                    </div>
+
+                `;
+
+            }
+
+
+            const priceSection =
+                document.getElementById(
+                    "cart-price-section"
+                );
+
+
+            if (priceSection) {
+
+                priceSection.remove();
+
+            }
+
+
+            const placeOrderBar =
+                document.getElementById(
+                    "cart-place-order-bar"
+                );
+
+
+            if (placeOrderBar) {
+
+                placeOrderBar.remove();
+
+            }
+
+
+            const cartLayout =
+                document.querySelector(
+                    ".cart-layout"
+                );
+
+
+            if (cartLayout) {
+
+                cartLayout.style
+                    .gridTemplateColumns =
+                    "1fr";
+
+            }
+
+        }
+
+
+        // =====================================
+        // PRICE FORMAT
+        // =====================================
+
+        function formatPrice(price) {
+
+            return Number(price)
+                .toLocaleString(
+                    "en-IN",
+                    {
+                        minimumFractionDigits: 2,
+                        maximumFractionDigits: 2
+                    }
+                );
+
+        }
+
+
+        // =====================================
+        // CART TOAST
+        // =====================================
+
+        function showCartToast(
+            message,
+            type
+        ) {
+
+            const oldToast =
+                document.querySelector(
+                    ".dynamic-cart-toast"
+                );
+
+
+            if (oldToast) {
+
+                oldToast.remove();
+
+            }
+
+
+            const toast =
+                document.createElement(
+                    "div"
+                );
+
+
+            toast.className =
+                "dynamic-cart-toast";
+
+
+            toast.innerText =
+                message;
+
+
+            toast.style.background =
+                type === "error"
+                ? "#dc3545"
+                : "#28a745";
+
+
+            toast.style.position =
+                "fixed";
+
+
+            toast.style.top =
+                "90px";
+
+
+            toast.style.right =
+                "25px";
+
+
+            toast.style.color =
+                "#ffffff";
+
+
+            toast.style.padding =
+                "15px 20px";
+
+
+            toast.style.borderRadius =
+                "6px";
+
+
+            toast.style.fontWeight =
+                "600";
+
+
+            toast.style.zIndex =
+                "9999";
+
+
+            toast.style.boxShadow =
+                "0 8px 20px rgba(0,0,0,.2)";
+
+
+            document.body.appendChild(
+                toast
+            );
+
+
+            setTimeout(
+                function () {
+
+                    toast.remove();
+
+                },
+                2500
+            );
+
+        }
+
+    }
+);
+
+</script>
+
+{% endblock %}

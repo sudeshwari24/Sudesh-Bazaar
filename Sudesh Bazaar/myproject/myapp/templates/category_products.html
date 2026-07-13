@@ -1,0 +1,491 @@
+{% extends "base.html" %}
+{% load static %}
+
+{% block title %}
+{{ category.name }} Products
+{% endblock %}
+
+{% block content %}
+
+<section class="category-products-page">
+
+    <div class="category-page-header">
+
+        <h1>
+            {{ category.name }} Products
+        </h1>
+
+        <p>
+            Explore our latest {{ category.name }} products
+        </p>
+
+    </div>
+
+
+    <div class="product-container">
+
+        {% for product in products %}
+
+        <div class="product-card category-product-card">
+
+            <!-- =====================================
+                 WISHLIST HEART
+            ====================================== -->
+
+            <button
+                type="button"
+                class="category-heart-btn
+                {% if product.id in wishlist_product_ids %}
+                wishlist-added
+                {% endif %}"
+                data-url="{% url 'add_to_wishlist' product.id %}"
+                aria-label="Toggle wishlist"
+                title="Wishlist"
+            >
+                {% if product.id in wishlist_product_ids %}
+                    ♥
+                {% else %}
+                    ♡
+                {% endif %}
+            </button>
+
+
+            <a
+                href="{% url 'product_detail' product.id %}"
+                class="product-detail-link"
+            >
+
+                <img
+                    src="{{ product.image.url }}"
+                    alt="{{ product.name }}"
+                >
+
+            </a>
+
+
+            <a
+                href="{% url 'product_detail' product.id %}"
+                class="product-name-link"
+            >
+
+                <h3>
+                    {{ product.name }}
+                </h3>
+
+            </a>
+
+
+            <div class="product-price-row">
+
+                {% if product.original_price %}
+
+                <span class="original-price">
+                    ₹ {{ product.original_price }}
+                </span>
+
+                {% endif %}
+
+
+                <span class="our-price">
+                    ₹ {{ product.price }}
+                </span>
+
+
+                {% if product.discount_percentage > 0 %}
+
+                <span class="discount">
+                    {{ product.discount_percentage }}% OFF
+                </span>
+
+                {% endif %}
+
+            </div>
+
+
+            <button
+                type="button"
+                class="btn-submit add-cart-btn"
+                data-id="{{ product.id }}"
+            >
+                Add to Cart
+            </button>
+
+        </div>
+
+
+        {% empty %}
+
+        <div class="empty-products">
+
+            <h2>
+                No Products Available
+            </h2>
+
+            <p>
+                No products are currently available
+                in {{ category.name }}.
+            </p>
+
+            <a
+                href="{% url 'home' %}"
+                class="btn"
+            >
+                Back to Home
+            </a>
+
+        </div>
+
+        {% endfor %}
+
+    </div>
+
+</section>
+
+
+<script>
+
+document.addEventListener(
+    "DOMContentLoaded",
+    function () {
+
+
+        // =====================================
+        // ADD TO CART
+        // =====================================
+
+        document
+        .querySelectorAll(".add-cart-btn")
+        .forEach(button => {
+
+            button.addEventListener(
+                "click",
+                function () {
+
+                    const productId =
+                        this.dataset.id;
+
+                    const currentButton =
+                        this;
+
+                    currentButton.disabled =
+                        true;
+
+
+                    fetch(
+                        "/add-to-cart/"
+                        + productId
+                        + "/?quantity=1"
+                    )
+
+                    .then(response =>
+                        response.json()
+                    )
+
+                    .then(data => {
+
+                        if (data.login_required) {
+
+                            localStorage.setItem(
+                                "pending_cart",
+                                JSON.stringify({
+                                    productId: productId,
+                                    quantity: 1
+                                })
+                            );
+
+                            window.location.href =
+                                "/login/";
+
+                            return;
+                        }
+
+
+                        if (!data.success) {
+
+                            showToast(
+                                data.message,
+                                "error"
+                            );
+
+                            return;
+                        }
+
+
+                        const navbarCartCount =
+                            document.getElementById(
+                                "navbar-cart-count"
+                            );
+
+
+                        if (navbarCartCount) {
+
+                            navbarCartCount.innerText =
+                                data.cart_count;
+                        }
+
+
+                        showToast(
+                            data.message,
+                            "success"
+                        );
+
+                    })
+
+                    .catch(error => {
+
+                        console.error(
+                            "Cart Error:",
+                            error
+                        );
+
+                        showToast(
+                            "Something went wrong",
+                            "error"
+                        );
+
+                    })
+
+                    .finally(() => {
+
+                        currentButton.disabled =
+                            false;
+
+                    });
+
+                }
+            );
+
+        });
+
+
+
+        // =====================================
+        // WISHLIST HEART TOGGLE
+        // =====================================
+
+        document
+        .querySelectorAll(".category-heart-btn")
+        .forEach(button => {
+
+            button.addEventListener(
+                "click",
+                function () {
+
+                    const currentButton =
+                        this;
+
+                    const wishlistUrl =
+                        currentButton.dataset.url;
+
+
+                    currentButton.disabled =
+                        true;
+
+
+                    fetch(
+                        wishlistUrl,
+                        {
+                            method: "GET",
+                            headers: {
+                                "X-Requested-With":
+                                    "XMLHttpRequest"
+                            }
+                        }
+                    )
+
+                    .then(response => {
+
+                        if (!response.ok) {
+
+                            throw new Error(
+                                "Wishlist request failed"
+                            );
+                        }
+
+                        return response.json();
+
+                    })
+
+                    .then(data => {
+
+                        if (data.login_required) {
+
+                            window.location.href =
+                                "/login/";
+
+                            return;
+                        }
+
+
+                        if (!data.success) {
+
+                            showToast(
+                                data.message
+                                || "Wishlist update failed",
+                                "error"
+                            );
+
+                            return;
+                        }
+
+
+                        if (data.added) {
+
+                            currentButton.innerText =
+                                "♥";
+
+                            currentButton.classList.add(
+                                "wishlist-added"
+                            );
+
+                        } else {
+
+                            currentButton.innerText =
+                                "♡";
+
+                            currentButton.classList.remove(
+                                "wishlist-added"
+                            );
+
+                        }
+
+
+                        showToast(
+                            data.message,
+                            "success"
+                        );
+
+                    })
+
+                    .catch(error => {
+
+                        console.error(
+                            "Wishlist Error:",
+                            error
+                        );
+
+                        showToast(
+                            "Something went wrong",
+                            "error"
+                        );
+
+                    })
+
+                    .finally(() => {
+
+                        currentButton.disabled =
+                            false;
+
+                    });
+
+                }
+            );
+
+        });
+
+
+
+        // =====================================
+        // TOAST MESSAGE
+        // =====================================
+
+        function showToast(
+            message,
+            type
+        ) {
+
+            const oldToast =
+                document.querySelector(
+                    ".dynamic-product-toast"
+                );
+
+
+            if (oldToast) {
+                oldToast.remove();
+            }
+
+
+            const toast =
+                document.createElement("div");
+
+
+            toast.className =
+                "dynamic-product-toast";
+
+
+            toast.innerHTML =
+                type === "error"
+                ? "❌ " + message
+                : "✅ " + message;
+
+
+            toast.style.position =
+                "fixed";
+
+            toast.style.top =
+                "82px";
+
+            toast.style.right =
+                "22px";
+
+            toast.style.background =
+                type === "error"
+                ? "#dc3545"
+                : "#28a745";
+
+            toast.style.color =
+                "#ffffff";
+
+            toast.style.padding =
+                "16px 22px";
+
+            toast.style.borderRadius =
+                "9px";
+
+            toast.style.fontWeight =
+                "600";
+
+            toast.style.zIndex =
+                "9999";
+
+            toast.style.boxShadow =
+                "0 8px 22px rgba(0,0,0,.20)";
+
+            toast.style.transition =
+                "0.35s";
+
+
+            document.body.appendChild(
+                toast
+            );
+
+
+            setTimeout(
+                function () {
+
+                    toast.style.opacity =
+                        "0";
+
+                    toast.style.transform =
+                        "translateX(50px)";
+
+
+                    setTimeout(
+                        function () {
+                            toast.remove();
+                        },
+                        350
+                    );
+
+                },
+                2500
+            );
+
+        }
+
+    }
+);
+
+</script>
+
+{% endblock %}

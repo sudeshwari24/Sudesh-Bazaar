@@ -1,0 +1,361 @@
+ {% extends "base.html" %}
+{% load static %}
+
+{% block title %}
+Search Products
+{% endblock %}
+
+{% block content %}
+
+<section class="product-search-page">
+
+    <div class="product-search-container">
+
+
+        <!-- =====================================
+             SEARCH HEADING
+        ====================================== -->
+
+        <div class="product-search-heading">
+
+            {% if query %}
+
+            <div>
+
+                <h1>
+                    Search Results
+                </h1>
+
+                <p>
+                    Results for
+                    "<strong>{{ query }}</strong>"
+                </p>
+
+            </div>
+
+            {% else %}
+
+            <div>
+
+                <h1>
+                    Search Products
+                </h1>
+
+                <p>
+                    Search for your favourite products
+                </p>
+
+            </div>
+
+            {% endif %}
+
+        </div>
+
+
+        {% if products %}
+
+
+        <!-- =====================================
+             FILTER AND SORT
+        ====================================== -->
+
+        <div class="search-filter-bar">
+
+
+            <div class="search-result-count">
+
+                <strong>
+                    {{ products|length }}
+                </strong>
+
+                Product{{ products|length|pluralize }}
+                Found
+
+            </div>
+
+
+            <form
+                method="GET"
+                action="{% url 'product_search' %}"
+                class="search-filter-form"
+            >
+
+                <input
+                    type="hidden"
+                    name="q"
+                    value="{{ query }}"
+                >
+
+
+                <!-- STOCK FILTER -->
+
+                <div class="search-filter-group">
+
+                    <label>
+                        Stock
+                    </label>
+
+                    <select
+                        name="stock"
+                        onchange="this.form.submit()"
+                    >
+
+                        <option value="">
+                            All Products
+                        </option>
+
+                        <option
+                            value="in_stock"
+                            {% if selected_stock == "in_stock" %}
+                            selected
+                            {% endif %}
+                        >
+                            In Stock
+                        </option>
+
+                        <option
+                            value="out_of_stock"
+                            {% if selected_stock == "out_of_stock" %}
+                            selected
+                            {% endif %}
+                        >
+                            Out of Stock
+                        </option>
+
+                    </select>
+
+                </div>
+
+
+                <!-- SORT PRODUCTS -->
+
+                <div class="search-filter-group">
+
+                    <label>
+                        Sort By
+                    </label>
+
+                    <select
+                        name="sort"
+                        onchange="this.form.submit()"
+                    >
+
+                        <option value="">
+                            Relevance
+                        </option>
+
+                        <option
+                            value="price_low"
+                            {% if selected_sort == "price_low" %}
+                            selected
+                            {% endif %}
+                        >
+                            Price: Low to High
+                        </option>
+
+                        <option
+                            value="price_high"
+                            {% if selected_sort == "price_high" %}
+                            selected
+                            {% endif %}
+                        >
+                            Price: High to Low
+                        </option>
+
+                        <option
+                            value="name_az"
+                            {% if selected_sort == "name_az" %}
+                            selected
+                            {% endif %}
+                        >
+                            Name: A to Z
+                        </option>
+
+                        <option
+                            value="name_za"
+                            {% if selected_sort == "name_za" %}
+                            selected
+                            {% endif %}
+                        >
+                            Name: Z to A
+                        </option>
+
+                    </select>
+
+                </div>
+
+
+                {% if selected_sort or selected_stock %}
+
+                <a
+                    href="{% url 'product_search' %}?q={{ query|urlencode }}"
+                    class="search-clear-filter"
+                >
+                    CLEAR
+                </a>
+
+                {% endif %}
+
+
+            </form>
+
+        </div>
+
+
+        <!-- =====================================
+             PRODUCT GRID
+        ====================================== -->
+
+        <div class="search-product-grid">
+
+            {% for product in products %}
+
+            <div class="search-product-card">
+
+                <a
+                    href="{% url 'product_detail' product.id %}"
+                    class="search-product-image"
+                >
+
+                    <img
+                        src="{{ product.image.url }}"
+                        alt="{{ product.name }}"
+                    >
+
+                </a>
+
+
+                <div class="search-product-info">
+
+                    <span class="search-product-category">
+
+                        {{ product.category.name }}
+
+                    </span>
+
+
+                    <a
+                        href="{% url 'product_detail' product.id %}"
+                        class="search-product-name"
+                    >
+
+                        {{ product.name }}
+
+                    </a>
+
+
+                    <div class="search-product-price">
+
+                        <strong>
+
+                            ₹ {{ product.price }}
+
+                        </strong>
+
+
+                        {% if product.original_price %}
+
+                        <span>
+
+                            ₹ {{ product.original_price }}
+
+                        </span>
+
+                        {% endif %}
+
+                    </div>
+
+
+                    {% if product.stock > 0 %}
+
+                    <div class="search-product-stock in-stock">
+
+                        In Stock
+
+                    </div>
+
+                    {% else %}
+
+                    <div class="search-product-stock out-stock">
+
+                        Out of Stock
+
+                    </div>
+
+                    {% endif %}
+
+                </div>
+
+            </div>
+
+            {% endfor %}
+
+        </div>
+
+
+        {% elif query %}
+
+
+        <!-- =====================================
+             NO PRODUCTS
+        ====================================== -->
+
+        <div class="search-no-products">
+
+            <div class="search-empty-icon">
+
+                🔍
+
+            </div>
+
+
+            <h2>
+
+                No products found
+
+            </h2>
+
+
+            <p>
+
+                We couldn't find products matching
+
+                "<strong>{{ query }}</strong>"
+
+            </p>
+
+
+            {% if selected_sort or selected_stock %}
+
+            <a
+                href="{% url 'product_search' %}?q={{ query|urlencode }}"
+                class="search-back-home"
+            >
+
+                CLEAR FILTERS
+
+            </a>
+
+            {% else %}
+
+            <a
+                href="{% url 'home' %}"
+                class="search-back-home"
+            >
+
+                CONTINUE SHOPPING
+
+            </a>
+
+            {% endif %}
+
+        </div>
+
+        {% endif %}
+
+
+    </div>
+
+</section>
+
+{% endblock %}

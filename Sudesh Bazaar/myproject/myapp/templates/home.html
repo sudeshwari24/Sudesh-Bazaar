@@ -1,0 +1,132 @@
+ {% extends "base.html" %}
+{% load static %}
+
+{% block title %}
+Home
+{% endblock %}
+
+{% block content %}
+
+
+<!-- =====================================
+     HERO SECTION
+===================================== -->
+
+<section class="hero">
+
+    <div class="hero-content">
+
+        <h1>
+            Welcome to Sudesh Bazaar
+        </h1>
+
+        <p>
+            Discover quality products at great prices.
+            Shop from our latest collection and enjoy
+            a simple shopping experience.
+        </p>
+
+        <a
+            href="#categories"
+            class="hero-shop-btn"
+        >
+            SHOP NOW
+        </a>
+
+    </div>
+
+</section>
+
+
+<!-- =====================================
+     SHOP BY CATEGORY
+===================================== -->
+
+<section
+    class="categories-section"
+    id="categories"
+>
+
+    <div class="categories-content">
+
+        <div class="categories-header">
+
+            <h2>
+                Shop by Category
+            </h2>
+
+            <p>
+                Browse products from your favourite categories
+            </p>
+
+        </div>
+
+
+        {% if categories %}
+
+        <div class="category-container">
+
+            {% for category in categories %}
+
+            <a
+                href="{% url 'category_products' category.id %}"
+                class="category-card"
+            >
+
+                <div class="category-image">
+
+                    {% if category.image %}
+
+                    <img
+                        src="{{ category.image.url }}"
+                        alt="{{ category.name }}"
+                    >
+
+                    {% else %}
+
+                    <div class="category-no-image">
+                        📦
+                    </div>
+
+                    {% endif %}
+
+                </div>
+
+
+                <div class="category-info">
+
+                    <h3>
+                        {{ category.name }}
+                    </h3>
+
+                    <span>
+                        View Products
+                    </span>
+
+                </div>
+
+            </a>
+
+            {% endfor %}
+
+        </div>
+
+
+        {% else %}
+
+        <div class="categories-empty">
+
+            <p>
+                No Categories Available
+            </p>
+
+        </div>
+
+        {% endif %}
+
+    </div>
+
+</section>
+
+
+{% endblock %}

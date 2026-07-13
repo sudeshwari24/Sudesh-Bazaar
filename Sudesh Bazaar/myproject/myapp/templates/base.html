@@ -1,0 +1,281 @@
+ {% load static %}
+
+<!DOCTYPE html>
+
+<html lang="en">
+
+<head>
+
+    <meta charset="UTF-8">
+
+    <meta
+        name="viewport"
+        content="width=device-width, initial-scale=1.0"
+    >
+
+    <title>
+        {% block title %}
+        Sudesh Bazaar
+        {% endblock %}
+    </title>
+
+    <link
+        rel="stylesheet"
+        href="{% static 'css/style.css' %}"
+    >
+
+</head>
+
+
+<body>
+
+
+{% if request.resolver_match.url_name != "login" and request.resolver_match.url_name != "register" %}
+
+
+<!-- =====================================
+     NAVBAR
+===================================== -->
+
+<nav class="navbar">
+
+
+    <!-- =====================================
+         LOGO
+    ====================================== -->
+
+    <div class="logo">
+
+        <a href="{% url 'home' %}">
+            Sudesh Bazaar
+        </a>
+
+    </div>
+
+
+    <!-- =====================================
+         PRODUCT SEARCH
+    ====================================== -->
+
+    <form
+        method="GET"
+        action="{% url 'product_search' %}"
+        class="navbar-search"
+    >
+
+        <input
+            type="text"
+            name="q"
+            placeholder="Search for products..."
+            value="{{ request.GET.q|default:'' }}"
+            autocomplete="off"
+        >
+
+        <button type="submit">
+            🔍
+        </button>
+
+    </form>
+
+
+    <!-- =====================================
+         NAVIGATION LINKS
+    ====================================== -->
+
+    <ul class="nav-links">
+
+
+        <!-- HOME -->
+
+        <li>
+
+            <a href="{% url 'home' %}">
+                Home
+            </a>
+
+        </li>
+
+
+        <!-- PRODUCTS -->
+
+        <li>
+
+            <a href="{% url 'home' %}#categories">
+                Products
+            </a>
+
+        </li>
+
+
+        <!-- =====================================
+             CART
+        ====================================== -->
+
+        <li>
+
+            <a
+                href="{% url 'cart' %}"
+                class="nav-cart-link"
+            >
+
+                <span class="nav-cart-icon">
+                    🛒
+                </span>
+
+                <span>
+                    Cart
+                </span>
+
+                <span
+                    class="nav-cart-count"
+                    id="navbar-cart-count"
+                >
+                    {{ navbar_cart_count }}
+                </span>
+
+            </a>
+
+        </li>
+
+
+        <!-- =====================================
+             AUTHENTICATED USER
+        ====================================== -->
+
+        {% if user.is_authenticated %}
+
+
+        <!-- =====================================
+             WISHLIST
+        ====================================== -->
+
+        <li>
+
+            <a
+                href="{% url 'wishlist' %}"
+                class="nav-wishlist-link"
+            >
+
+                <span class="nav-wishlist-icon">
+                    ♥
+                </span>
+
+                <span>
+                    Wishlist
+                </span>
+
+            </a>
+
+        </li>
+
+
+        <!-- =====================================
+             MY ORDERS
+        ====================================== -->
+
+        <li>
+
+            <a
+                href="{% url 'my_orders' %}"
+                class="nav-orders-link"
+            >
+
+                My Orders
+
+            </a>
+
+        </li>
+
+
+        <!-- =====================================
+             USERNAME
+        ====================================== -->
+
+        <li>
+
+            <a
+                href="{% url 'my_account' %}"
+                class="nav-user-link"
+            >
+
+                Hi, {{ user.username }}
+
+            </a>
+
+        </li>
+
+
+        <!-- =====================================
+             LOGOUT
+        ====================================== -->
+
+        <li>
+
+            <a
+                href="{% url 'logout' %}"
+                class="login-btn"
+            >
+
+                Logout
+
+            </a>
+
+        </li>
+
+
+        <!-- =====================================
+             GUEST USER
+        ====================================== -->
+
+        {% else %}
+
+
+        <!-- LOGIN -->
+
+        <li>
+
+            <a
+                href="{% url 'login' %}"
+                class="login-btn"
+            >
+
+                Login
+
+            </a>
+
+        </li>
+
+
+        {% endif %}
+
+
+    </ul>
+
+
+</nav>
+
+
+{% endif %}
+
+
+<!-- =====================================
+     AUTH CONTENT
+===================================== -->
+
+{% block auth_content %}
+
+{% endblock %}
+
+
+<!-- =====================================
+     PAGE CONTENT
+===================================== -->
+
+{% block content %}
+
+{% endblock %}
+
+
+</body>
+
+</html>

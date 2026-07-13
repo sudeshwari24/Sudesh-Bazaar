@@ -1,0 +1,107 @@
+{% load static %}
+<!DOCTYPE html>
+<html>
+<head>
+    <title>Create Account - Sudesh Bazaar</title>
+    <link rel="stylesheet" href="{% static 'css/style.css' %}">
+</head>
+<body>
+
+<div class="card">
+
+    <h2>Create Your Account</h2>
+ 
+
+    <form method="post">
+        {% csrf_token %}
+
+        <input type="text" class="form-control" placeholder="First Name" name="firstname" value="{{ firstname|default:'' }}" required>
+
+        <input type="text" class="form-control" placeholder="Last Name" name="lastname" value="{{ lastname|default:'' }}" required>
+
+        <input type="text" class="form-control" placeholder="Username" name="username"  value="{{ username|default:'' }}" required>
+ 
+
+        <input type="email" id="email" class="form-control" placeholder="Email Address" name="email" value="{{ email|default:'' }}" required>
+        {% if email_error %}
+        <small style="color:red;">
+            {{ email_error }}
+        </small>
+        {% endif %}
+         
+        <input type="text" id="phone" class="form-control" placeholder="Phone Number" name="phone" maxlength="10" value="{{ phone|default:'' }}" required>
+        {% if phone_error %}
+            <small style="color:red; display:block; margin-top:5px; margin-bottom:10px;">
+                {{ phone_error }}
+            </small>
+        {% endif %}
+        <input type="password" id ="password" class="form-control" placeholder="Create Password" name="password" required>
+        <small id="passwordError" style="color:red; display:block; margin-bottom:10px;"></small>
+
+        <input type="password" id="confirm_password"class="form-control" placeholder="Confirm Password" name="confirm_password" required>
+        <small id="confirmError" style="color:red; display:block; margin-bottom:10px;"></small>
+
+        <button type="submit" class="btn-submit">
+            Register
+        </button>
+
+    </form>
+
+    <p class="register-text">
+        Already have an account?
+        <a href="{% url 'login' %}">Login</a>
+    </p>
+
+</div>
+<script>
+
+window.onload = function () {
+
+    // Phone Validation
+    const phone = document.getElementById("phone");
+
+    phone.addEventListener("input", function () {
+        this.value = this.value.replace(/\D/g, "").slice(0,10);
+    });
+
+    // Password Validation
+    const password = document.getElementById("password");
+    const passwordError = document.getElementById("passwordError");
+
+    password.addEventListener("input", function () {
+
+        const regex = /^(?=.*[0-9])(?=.*[@$!%*?&])[A-Z].*$/;
+
+        if(this.value==""){
+            passwordError.innerHTML="";
+        }
+        else if(!regex.test(this.value)){
+            passwordError.innerHTML="Password must start with Capital Letter, contain Number and Special Character";
+        }
+        else{
+            passwordError.innerHTML="";
+        }
+
+    });
+
+    // Confirm Password Validation
+    const confirm = document.getElementById("confirm_password");
+    const confirmError = document.getElementById("confirmError");
+
+    confirm.addEventListener("input", function(){
+
+        if(password.value != confirm.value){
+            confirmError.innerHTML="Passwords do not match";
+        }
+        else{
+            confirmError.innerHTML="";
+        }
+
+    });
+
+};
+
+</script>
+
+</body>
+</html>

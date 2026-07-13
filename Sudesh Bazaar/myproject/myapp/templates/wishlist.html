@@ -1,0 +1,186 @@
+{% extends "base.html" %}
+{% load static %}
+
+{% block title %}
+My Wishlist
+{% endblock %}
+
+{% block content %}
+
+<section class="wishlist-page">
+
+    <div class="wishlist-container">
+
+        <div class="wishlist-header">
+
+            <h1>
+                My Wishlist
+            </h1>
+
+            <p>
+                {{ wishlist_items|length }}
+                Product{{ wishlist_items|length|pluralize }}
+            </p>
+
+        </div>
+
+
+        {% if messages %}
+
+            {% for message in messages %}
+
+            <div class="wishlist-message">
+                {{ message }}
+            </div>
+
+            {% endfor %}
+
+        {% endif %}
+
+
+        {% if wishlist_items %}
+
+        <div class="wishlist-list">
+
+            {% for item in wishlist_items %}
+
+            <div class="wishlist-card">
+
+                <a
+                    href="{% url 'product_detail' item.product.id %}"
+                    class="wishlist-product-image"
+                >
+
+                    <img
+                        src="{{ item.product.image.url }}"
+                        alt="{{ item.product.name }}"
+                    >
+
+                </a>
+
+
+                <div class="wishlist-product-info">
+
+                    <span class="wishlist-category">
+
+                        {{ item.product.category.name }}
+
+                    </span>
+
+
+                    <a
+                        href="{% url 'product_detail' item.product.id %}"
+                        class="wishlist-product-name"
+                    >
+
+                        {{ item.product.name }}
+
+                    </a>
+
+
+                    <div class="wishlist-price">
+
+                        <strong>
+                            ₹ {{ item.product.price }}
+                        </strong>
+
+
+                        {% if item.product.original_price %}
+
+                        <span>
+                            ₹ {{ item.product.original_price }}
+                        </span>
+
+                        {% endif %}
+
+
+                        {% if item.product.discount_percentage > 0 %}
+
+                        <em>
+                            {{ item.product.discount_percentage }}% Off
+                        </em>
+
+                        {% endif %}
+
+                    </div>
+
+
+                    {% if item.product.stock > 0 %}
+
+                    <div class="wishlist-stock in-stock">
+                        In Stock
+                    </div>
+
+                    {% else %}
+
+                    <div class="wishlist-stock out-stock">
+                        Out of Stock
+                    </div>
+
+                    {% endif %}
+
+                </div>
+
+
+                <div class="wishlist-actions">
+
+                    {% if item.product.stock > 0 %}
+
+                    <a
+                        href="{% url 'product_detail' item.product.id %}"
+                        class="wishlist-view-btn"
+                    >
+                        VIEW PRODUCT
+                    </a>
+
+                    {% endif %}
+
+
+                    <a
+                        href="{% url 'remove_from_wishlist' item.id %}"
+                        class="wishlist-remove-btn"
+                    >
+                        REMOVE
+                    </a>
+
+                </div>
+
+            </div>
+
+            {% endfor %}
+
+        </div>
+
+
+        {% else %}
+
+        <div class="wishlist-empty">
+
+            <div class="wishlist-empty-icon">
+                ♡
+            </div>
+
+            <h2>
+                Your wishlist is empty
+            </h2>
+
+            <p>
+                Save products you like and view them here.
+            </p>
+
+            <a
+                href="{% url 'home' %}"
+                class="wishlist-shop-btn"
+            >
+                CONTINUE SHOPPING
+            </a>
+
+        </div>
+
+        {% endif %}
+
+    </div>
+
+</section>
+
+{% endblock %}
